@@ -39,7 +39,7 @@ def main(auto_context,gpt3_temp,codex_temp):
             if query.lower().startswith('codex-temp') or query.lower().startswith('temperature'):
                 try:
                      new_codex_temp = float(query.split()[1])
-                except ValueError:
+                except (ValueError, IndexError) as e:
                      console.print("\tFailed at setting Codex temperature with command:",query) 
                      continue
                 if 0>new_codex_temp or new_codex_temp>1:
@@ -53,7 +53,7 @@ def main(auto_context,gpt3_temp,codex_temp):
             if query.lower().startswith('gpt3-temp'):
                 try:
                      new_gpt3_temp = float(query.split()[1])
-                except ValueError:
+                except (ValueError, IndexError) as e:
                      console.print("\tFailed at setting GPT3 temperature with command:",query) 
                      continue
                 if 0>new_codex_temp or new_codex_temp>1:
