@@ -9,6 +9,31 @@ from rich.syntax import Syntax
 pretty.install()
 
 
+def update_temperature(query, codex_temp, gpt3_temp, console):
+    try:
+        new_codex_temp = float(query.split()[1])
+    except (ValueError, IndexError) as e:
+            console.print("\tFailed at setting Codex temperature with command:",query)
+    if 0 > new_codex_temp or new_codex_temp > 1:
+        console.print("\tFailed at setting Codex temperature with command:",query)
+        console.print("\tTemperature out of range [0,1]")
+    else:
+        codex_temp = new_codex_temp
+        console.print("\tSetting Codex query temperature to",codex_temp)
+
+    if query.lower().startswith('gpt3-temp'):
+        try:
+            new_gpt3_temp = float(query.split()[1])
+        except (ValueError, IndexError) as e:
+            console.print("\tFailed at setting GPT3 temperature with command:",query)
+        if 0>new_codex_temp or new_codex_temp>1:
+            console.print("\tFailed at setting GPT3 temperature with command:",query)
+            console.print("\tTemperature out of range [0,1]")
+        else:
+            gpt3_temp = new_gpt3_temp
+            console.print("\tSetting GPT3 query temperature to",gpt3_temp)
+    return codex_temp, gpt3_temp
+
 
 _DEFAULT_GPT3_T = 0.3
 _DEFAULT_CODEX_T = 0.0
@@ -37,36 +62,11 @@ def main(auto_context,gpt3_temp,codex_temp):
             console.print('\n🤔 nothing to copy\n' + prompt, end='')
     for i, query in enumerate(text_iter(cli_prompt, make_copy)):
             if query.lower().startswith('codex-temp') or query.lower().startswith('temperature'):
-                try:
-                     new_codex_temp = float(query.split()[1])
-                except (ValueError, IndexError) as e:
-                     console.print("\tFailed at setting Codex temperature with command:",query) 
-                     continue
-                if 0>new_codex_temp or new_codex_temp>1:
-                     console.print("\tFailed at setting Codex temperature with command:",query) 
-                     console.print("\tTemperature out of range [0,1]")
-                     continue
-                codex_temp = new_codex_temp
-                console.print("\tSetting Codex query temperature to",codex_temp)
+                codex_temp, gpt3_temp = update_temperature(query, codex_temp, gpt3_temp, console)
                 continue
-
-            if query.lower().startswith('gpt3-temp'):
-                try:
-                     new_gpt3_temp = float(query.split()[1])
-                except (ValueError, IndexError) as e:
-                     console.print("\tFailed at setting GPT3 temperature with command:",query) 
-                     continue
-                if 0>new_codex_temp or new_codex_temp>1:
-                     console.print("\tFailed at setting GPT3 temperature with command:",query) 
-                     console.print("\tTemperature out of range [0,1]")
-                     continue
-                gpt3_temp = new_gpt3_temp
-                console.print("\tSetting GPT3 query temperature to",gpt3_temp)
-                continue
-
             if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
                 break
-            if query == '':
+            if query == 'c':
                 context = None
                 cli_prompt[0] = '👋'
             elif context is None:

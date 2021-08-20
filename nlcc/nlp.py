@@ -6,7 +6,7 @@ from dataclasses import dataclass
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 prompts = {
-    'mdtraj': '''import mdtraj as md'''
+    'mdtraj': ('''import mdtraj as md''', '# ', '"""')
 }
 
 
@@ -14,22 +14,24 @@ prompts = {
 class Context:
     type: str = ''
     prompt: str = ''
+    comment: str = '# '
+    multiline_comment: str = None
 
 
 def _query_codex(query, training_string, T=0.00):
-    prompt = '\n'.join([training_string, '"""\n' + query, '\n"""\n'])
+    prompt = '\n'.join([training_string, query])
     # return prompt
     response = openai.Completion.create(
         engine="davinci-codex",
         prompt=prompt,
         temperature=T,
-        max_tokens=256,
+        max_tokens=64,
         top_p=1,
         frequency_penalty=0.0,
         presence_penalty=0,
-        stop=['"""']
+        stop=['#', '//', '"""']
     )
-    return response['choices'][0]['text'], response
+    return response['choices'][0]['text'], prompt
 
 def _query_gpt3(query, T=0.3):
     # return prompt
@@ -39,6 +41,7 @@ def _query_gpt3(query, T=0.3):
     temperature=T,
     max_tokens=60,
     top_p=1,
+    best_of=3,
     frequency_penalty=0,
     presence_penalty=0,
     stop=["###"]
@@ -60,13 +63,20 @@ def run_gpt_search(query, context, auto_context=False, codex_temp=0.0, gpt3_temp
         e,r = r.split(',')
         print(e, r)
         if r in prompts:
-            context = Context(e + ' ' + r, prompts[r])
+            context = Context(e + ' ' + r, *prompts[r])
         else:
             if auto_context is True:
                 context = Context(e +  ' ' + r, f'# This script is for the {r} library')
             else:
                 context = Context(e,'')
     else:
-        r, _ = _query_codex(query, context.prompt, T=codex_temp)
+        # count newlines
+        if len(query.split('\n')) == 1:
+            if context.multiline_comment:
+                query = context.multiline_comment + '\n' + query + '\n' + context.multiline_comment + '\n'
+            else:
+                query = context.comment + query + '\n'
+        r, p = _query_codex(query, context.prompt, T=codex_temp)
+        context.prompt = p + r
     result = r
     return result, context
