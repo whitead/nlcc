@@ -63,9 +63,9 @@ def run_gpt_search(query, context, auto_context=False, codex_temp=0.0, gpt3_temp
             context = Context(e + ' ' + r, prompts[r])
         else:
             if auto_context is True:
-                context = Context(e + r + e, f'# This script is for the {r} library')
+                context = Context(e +  ' ' + r, f'# This script is for the {r} library')
             else:
-                context = Context('🤖','')
+                context = Context(e,'')
     else:
         r, _ = _query_codex(query, context.prompt, T=codex_temp)
     result = r
