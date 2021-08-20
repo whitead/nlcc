@@ -18,7 +18,7 @@ setup(name='nlcc',
       install_requires=[
           'click',
           'numpy',
-          'openai',
+          'openai', 'pyperclip',
           'prompt_toolkit',
           'rich'],
       test_suite='tests',

@@ -4,9 +4,10 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.key_binding import KeyBindings
 
 
-def text_iter(cli_prompt):
+def text_iter(cli_prompt, copy):
 
     kb = KeyBindings()
+    session = None
 
     @kb.add('enter')
     def _(event):
@@ -14,7 +15,9 @@ def text_iter(cli_prompt):
     @kb.add('escape', 'enter')
     def _(event):
         event.current_buffer.insert_text('\n')
-
+    @kb.add('c-t')
+    def _(event):
+        copy(f'nlcc{cli_prompt[0]}:>')
 
     history = InMemoryHistory()
     session = PromptSession(
