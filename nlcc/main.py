@@ -10,9 +10,21 @@ pretty.install()
 
 
 
+_DEFAULT_GPT3_T = 0.3
+_DEFAULT_CODEX_T = 0.0
+
 @click.command()
 @click.option('--auto_context',default=False,is_flag=True,help="Detect a context from my command")
-def main(auto_context):
+@click.option('--gpt3_temp',default=_DEFAULT_GPT3_T,help="Set the default GPT3 temperature")
+@click.option('--codex_temp',default=_DEFAULT_GPT3_T,help="Set the default CODEX temperature")
+def main(auto_context,gpt3_temp,codex_temp):
+    if gpt3_temp<0 or gpt3_temp>1.0:
+        gpt3_temp = _DEFAULT_GPT3_T
+        print("Supplied GPT-3 temperature out of bounds, using",gpt3_temp)
+    if codex_temp<0 or codex_temp>1.0:
+        codex_temp = _DEFAULT_CODEX_T
+        print("Supplied CODEX temperature out of bounds, using",codex_temp)
+
     console = Console()
     context = None
     # make a list, so it's pass by ref
@@ -24,16 +36,44 @@ def main(auto_context):
         else:
             console.print('\n🤔 nothing to copy\n' + prompt, end='')
     for i, query in enumerate(text_iter(cli_prompt, make_copy)):
+            if query.lower().startswith('codex-temp') or query.lower().startswith('temperature'):
+                try:
+                     new_codex_temp = float(query.split()[1])
+                except ValueError:
+                     console.print("\tFailed at setting Codex temperature with command:",query) 
+                     continue
+                if 0>new_codex_temp or new_codex_temp>1:
+                     console.print("\tFailed at setting Codex temperature with command:",query) 
+                     console.print("\tTemperature out of range [0,1]")
+                     continue
+                codex_temp = new_codex_temp
+                console.print("\tSetting Codex query temperature to",codex_temp)
+                continue
+
+            if query.lower().startswith('gpt3-temp'):
+                try:
+                     new_gpt3_temp = float(query.split()[1])
+                except ValueError:
+                     console.print("\tFailed at setting GPT3 temperature with command:",query) 
+                     continue
+                if 0>new_codex_temp or new_codex_temp>1:
+                     console.print("\tFailed at setting GPT3 temperature with command:",query) 
+                     console.print("\tTemperature out of range [0,1]")
+                     continue
+                gpt3_temp = new_gpt3_temp
+                console.print("\tSetting GPT3 query temperature to",gpt3_temp)
+                continue
+
             if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
                 break
             if query == '':
                 context = None
                 cli_prompt[0] = '👋'
             elif context is None:
-                result, context = run_gpt_search(query, context, auto_context)
+                result, context = run_gpt_search(query, context, auto_context, codex_temp=codex_temp, gpt3_temp=gpt3_temp)
                 cli_prompt[0] = '|' + context.type
             else:
-                result, context = run_gpt_search(query, context)
+                result, context = run_gpt_search(query, context, codex_temp=codex_temp, gpt3_temp=gpt3_temp)
                 console.print(Syntax(context.prompt, 'python', theme='monokai', line_numbers=True))
                 console.print(Syntax(result, 'python', theme='monokai', line_numbers=True))
                 context.prompt += result + '\n'
