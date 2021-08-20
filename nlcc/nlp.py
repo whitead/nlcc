@@ -1,5 +1,6 @@
 import os
 import openai
+import unicodedata
 from dataclasses import dataclass
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -34,7 +35,7 @@ def _query_gpt3(query):
     # return prompt
     response = openai.Completion.create(
     engine="davinci",
-    prompt=f"This takes text and identifies which computational chemistry library it is about.\n\nText: \"Let's do something with mdtraj\"\nLibrary: mdtraj\n###\nText: \"MD in gromacs\"\nLibrary: gromacs\n###\nText: \"Protein analysis\"\nLibrary: mdtraj\n###\nText: \"Write a slurm script\"\nLibrary: slurm\n###\nText: \"{query}\"\nLibrary:",
+    prompt=f"This takes text and identifies which computational chemistry library it is about and gives an appropriate emoji. \n\nText: \"Let's do something with mdtraj\"\nLibrary: ⚗,mdtraj\n###\nText: \"MD in gromacs\"\nLibrary: 🍏,gromacs\n###\nText: \"Protein analysis\"\nLibrary: 🌳,biopython\n###\nText: \"Write a slurm script\"\nLibrary: 📝,slurm\n###\nText: \"{query}\"\nLibrary:",
     temperature=0.3,
     max_tokens=60,
     top_p=1,
@@ -56,13 +57,15 @@ def run_gpt_search(query, context, auto_context=False):
     if context is None:
         r,full_response = _query_gpt3(query)
         r = r.split()[0]
+        e,r = r.split(',')
+        print(e, r)
         if r in prompts:
-            context = Context(r, prompts[r])
+            context = Context(e + ' ' + r, prompts[r])
         else:
             if auto_context is True:
-                context = Context(r, f'# This script is for the {r} library')
+                context = Context(e + r + e, f'# This script is for the {r} library')
             else:
-                context = Context('','')
+                context = Context('🤖','')
     else:
         r, _ = _query_codex(query, context.prompt)
     result = r

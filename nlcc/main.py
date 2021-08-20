@@ -31,7 +31,7 @@ def main(auto_context):
                 cli_prompt[0] = '👋'
             elif context is None:
                 result, context = run_gpt_search(query, context, auto_context)
-                cli_prompt[0] = '🐍' + context.type + '🐍'
+                cli_prompt[0] = '|' + context.type
             else:
                 result, context = run_gpt_search(query, context)
                 console.print(Syntax(context.prompt, 'python', theme='monokai', line_numbers=True))
