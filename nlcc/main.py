@@ -10,7 +10,8 @@ pretty.install()
 
 
 @click.command()
-def main():
+@click.option('--auto_context',default=False,is_flag=True,help="Detect a context from my command")
+def main(auto_context):
     console = Console()
     context = None
     # make a list, so it's pass by ref
@@ -22,7 +23,7 @@ def main():
                 context = None
                 cli_prompt[0] = '👋'
             elif context is None:
-                result, context = run_gpt_search(query, context)
+                result, context = run_gpt_search(query, context, auto_context)
                 cli_prompt[0] = '🐍' + context.type + '🐍'
             else:
                 result, context = run_gpt_search(query, context)

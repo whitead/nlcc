@@ -52,14 +52,17 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 
-def run_gpt_search(query, context):
+def run_gpt_search(query, context, auto_context=False):
     if context is None:
-        r,_ = _query_gpt3(query)
+        r,full_response = _query_gpt3(query)
         r = r.split()[0]
         if r in prompts:
             context = Context(r, prompts[r])
         else:
-            context = Context(r, f'# This script is for the {r} library')
+            if auto_context is True:
+                context = Context(r, f'# This script is for the {r} library')
+            else:
+                context = Context('','')
     else:
         r, _ = _query_codex(query, context.prompt)
     result = r
