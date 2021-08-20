@@ -2,7 +2,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import InMemoryHistory
 
-def text_iter():
+def text_iter(cli_prompt):
     history = InMemoryHistory()
     session = PromptSession(
        history=history,
@@ -11,5 +11,5 @@ def text_iter():
     complete_while_typing=True
     )
     while True:
-        q = session.prompt('nlcc>')
+        q = session.prompt(f'nlcc{cli_prompt[0]}:>')
         yield q

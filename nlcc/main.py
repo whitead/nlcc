@@ -12,15 +12,21 @@ pretty.install()
 @click.command()
 def main():
     console = Console()
-    code = ''
-    for i, query in enumerate(text_iter()):
-            if query.lower() == 'exit' or query.lower() == 'q' or query.lower == 'quit':
+    context = None
+    # make a list, so it's pass by ref
+    cli_prompt = ['👋']
+    for i, query in enumerate(text_iter(cli_prompt)):
+            if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
                 break
             if query == '':
-                code = ''
-            result = run_gpt_search(code + query)
-            # have to cache selection because vmd sockets are weird
-            if result['type'] == 'mdtraj Command':
-                code = result['data']
-                syntax = Syntax(code, "python", theme="monokai", line_numbers=False)
-                console.print(syntax)
+                context = None
+                cli_prompt[0] = '👋'
+            elif context is None:
+                result, context = run_gpt_search(query, context)
+                cli_prompt[0] = '🐍' + context.type + '🐍'
+            else:
+                result, context = run_gpt_search(query, context)
+                console.print(Syntax(context.prompt, 'python', theme='monokai', line_numbers=True))
+                console.print(Syntax(result, 'python', theme='monokai', line_numbers=True))
+                context.prompt += result + '\n'
+

@@ -1,14 +1,21 @@
 import os
 import openai
+from dataclasses import dataclass
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-_mdtraj_prompt = '''
-import mdtraj as md
-'''
+prompts = {
+    'mdtraj': '''import mdtraj as md'''
+}
 
 
-def _query_gpt3(query, training_string, T=0.00):
+@dataclass
+class Context:
+    type: str = ''
+    prompt: str = ''
+
+
+def _query_codex(query, training_string, T=0.00):
     prompt = '\n'.join([training_string, '"""\n' + query, '\n"""\n'])
     # return prompt
     response = openai.Completion.create(
@@ -23,9 +30,37 @@ def _query_gpt3(query, training_string, T=0.00):
     )
     return response['choices'][0]['text'], response
 
+def _query_gpt3(query):
+    # return prompt
+    response = openai.Completion.create(
+    engine="davinci",
+    prompt=f"This takes text and identifies which computational chemistry library it is about.\n\nText: \"Let's do something with mdtraj\"\nLibrary: mdtraj\n###\nText: \"MD in gromacs\"\nLibrary: gromacs\n###\nText: \"Protein analysis\"\nLibrary: mdtraj\n###\nText: \"Write a slurm script\"\nLibrary: slurm\n###\nText: \"{query}\"\nLibrary:",
+    temperature=0.3,
+    max_tokens=60,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=["###"]
+    )
 
-def run_gpt_search(query):
-    result = {'type': 'mdtraj Command'}
-    r, _ = _query_gpt3(query, _mdtraj_prompt)
-    result['data'] = r
-    return result
+    return response['choices'][0]['text'], response
+
+import os
+import openai
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
+
+def run_gpt_search(query, context):
+    if context is None:
+        r,_ = _query_gpt3(query)
+        r = r.split()[0]
+        if r in prompts:
+            context = Context(r, prompts[r])
+        else:
+            context = Context(r, f'# This script is for the {r} library')
+    else:
+        r, _ = _query_codex(query, context.prompt)
+    result = r
+    return result, context
