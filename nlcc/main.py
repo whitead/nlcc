@@ -8,6 +8,11 @@ from rich.console import Console
 from rich.syntax import Syntax
 pretty.install()
 
+def print_header(console, codex_temp):
+    help_string = ">> ctrl-t:copy_output\tcurrent_temperature: {}".format(codex_temp)
+    style = "bold white on blue"
+    console.print(help_string, style=style)
+
 
 def update_temperature(query, codex_temp, gpt3_temp, console):
     try:
@@ -60,6 +65,7 @@ def main(auto_context,gpt3_temp,codex_temp):
             console.print('\n✨copied✨\n' + prompt, end='')
         else:
             console.print('\n🤔 nothing to copy\n' + prompt, end='')
+    print_header(console, codex_temp)
     for i, query in enumerate(text_iter(cli_prompt, make_copy)):
             if query.lower().startswith('codex-temp') or query.lower().startswith('temperature'):
                 codex_temp, gpt3_temp = update_temperature(query, codex_temp, gpt3_temp, console)
@@ -77,4 +83,4 @@ def main(auto_context,gpt3_temp,codex_temp):
                 console.print(Syntax(context.prompt, 'python', theme='monokai', line_numbers=True))
                 console.print(Syntax(result, 'python', theme='monokai', line_numbers=True))
                 context.prompt += result + '\n'
-
+            print_header(console, codex_temp)
