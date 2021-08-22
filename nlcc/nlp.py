@@ -30,7 +30,6 @@ prompts = {}
 for f in files(nlcc.prompts).iterdir():
     c = yaml.safe_load(f.read_text())
     for k, v in c.items():
-        print(k, v)
         prompts.update({k: Prompt(**v)})
 
 
