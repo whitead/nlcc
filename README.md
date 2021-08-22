@@ -1,15 +1,10 @@
 # nlcc
 
-To turn on automatic context detextion, use
+## Install
 
-nlcc --auto_context
-
-To change the Codex search temperature to TEMP, run
-temperature TEMP
-or
-codex-temp TEMP
-
-`c` resets context
+```sh
+pip install -e .
+```
 
 ## key bindings
 
