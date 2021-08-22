@@ -68,8 +68,8 @@ def main(engine, help):
     kb_info = readme.split('## key bindings')[-1]
     help_message = '# 🧠 nlcc 🧠 \n' + '## Info on keybinds\n' + kb_info
 
+    console.print(Markdown(help_message))
     if(help):
-        console.print(Markdown(help_message))
         exit()
 
     def help(e):
