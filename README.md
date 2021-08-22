@@ -17,3 +17,4 @@ pip install -e .
 * `ctrl-t` adjust temperature
 * `ctrl-u` print running status
 * `ctrl-c` quit
+* `ctrl-x` write to file (same output as copy to clipboard)

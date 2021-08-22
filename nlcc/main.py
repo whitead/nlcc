@@ -44,14 +44,30 @@ _DEFAULT_CODEX_T = 0.0
 
 
 @click.command()
-def main():
+@click.option('--help', is_flag=True)
+def main(help):
     console = Console()
     context = None
     adjustTemp = False
+    writeFile = False
     codex_temp, gpt3_temp = _DEFAULT_CODEX_T, _DEFAULT_GPT3_T
 
     # make a list, so it's pass by ref
     cli_prompt = ['👋']
+
+    # welcome message
+    readme = metadata('nlcc')['Description']
+    kb_info = readme.split('## key bindings')[-1]
+    help_message = '# 🧠 nlcc 🧠 \n' + '## Info on keybinds\n' + kb_info
+
+    if(help):
+        console.print(Markdown(help_message))
+        exit()
+
+    def help(e):
+        console.print()
+        console.print(Markdown(help_message))
+        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
 
     # make it here to have access to context
     def make_copy(e):
@@ -61,15 +77,6 @@ def main():
         else:
             console.print('\n🤔 nothing to copy\n' +
                           f'nlcc{cli_prompt[0]}:>', end='')
-    # welcome message
-    readme = metadata('nlcc')['Description']
-    kb_info = readme.split('## key bindings')[-1]
-    help_message = '# 🧠 nlcc 🧠 \n' + '## Info on keybinds\n' + kb_info
-
-    def help(e):
-        console.print()
-        console.print(Markdown(help_message))
-        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
 
     def status(e):
         console.print()
@@ -99,8 +106,13 @@ def main():
         console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
         # pretty.pprint(g)
 
+    def write(e):
+        nonlocal writeFile
+        writeFile = True
+        console.print(f'\nfilename:✍️📝>', end='')
+
     kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute,
-           'c-q': help, 'c-u': status, 'c-t': temperature}
+           'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write}
     for i, query in enumerate(text_iter(cli_prompt, kbs)):
         if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
             break
@@ -109,7 +121,15 @@ def main():
                 query, codex_temp, gpt3_temp, console)
             adjustTemp = False
             continue
-
+        elif writeFile:
+            if context:
+                with open(query, 'w') as f:
+                    f.write(context.text + '\n')
+                    console.print(
+                        f'✨wrote to {query}✨')
+            else:
+                console.print('🤔 nothing to write')
+                writeFile = False
         elif context is None:
             result, context = run_gpt_search(
                 query, context, codex_temp=codex_temp, gpt3_temp=gpt3_temp)
