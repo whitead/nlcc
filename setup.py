@@ -16,8 +16,9 @@ setup(name='nlcc',
       license='MIT',
       packages=['nlcc'],
       install_requires=[
-          'click',
-          'numpy',
+          'click', 'importlib_resources',
+          'importlib-metadata',
+          'numpy', 'pyyaml',
           'openai', 'pyperclip',
           'prompt_toolkit',
           'rich'],
@@ -27,6 +28,7 @@ setup(name='nlcc',
         [console_scripts]
         nlcc=nlcc.main:main
             ''',
+      package_data={'nlcc': ['prompts/*yml']},
       long_description=long_description,
       long_description_content_type="text/markdown",
       classifiers=[

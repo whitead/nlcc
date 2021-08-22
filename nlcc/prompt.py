@@ -4,7 +4,7 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.key_binding import KeyBindings
 
 
-def text_iter(cli_prompt, copy):
+def text_iter(cli_prompt, extra_kbs):
 
     kb = KeyBindings()
     session = None
@@ -12,21 +12,21 @@ def text_iter(cli_prompt, copy):
     @kb.add('enter')
     def _(event):
         event.current_buffer.validate_and_handle()
+
     @kb.add('escape', 'enter')
     def _(event):
         event.current_buffer.insert_text('\n')
-    @kb.add('c-t')
-    def _(event):
-        copy(f'nlcc{cli_prompt[0]}:>')
 
+    for k, v in extra_kbs.items():
+        kb.add(k)(v)
     history = InMemoryHistory()
     session = PromptSession(
-       history=history,
-    auto_suggest=AutoSuggestFromHistory(),
-    enable_history_search=True,
-    complete_while_typing=True,
-    multiline=True,
-    key_bindings=kb
+        history=history,
+        auto_suggest=AutoSuggestFromHistory(),
+        enable_history_search=True,
+        complete_while_typing=True,
+        multiline=True,
+        key_bindings=kb
     )
     while True:
         q = session.prompt(f'nlcc{cli_prompt[0]}:>')

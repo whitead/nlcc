@@ -1,0 +1,6 @@
+numpy:
+    text: |
+        import numpy as np
+        import matplotlib.pyplot as plt
+    comment: '#'
+    multiline_comment: '"""'

@@ -1,0 +1,14 @@
+gromacs:
+    text: |
+        #!/bin/bash
+        # this script executes gromacs commands
+        source /usr/local/gromacs/bin/GMXRC
+    comment: '#'
+    stop:
+      - "\n"
+bash:
+  text: |
+      #!/bin/bash
+  comment: '#'
+  stop:
+    - "\n"

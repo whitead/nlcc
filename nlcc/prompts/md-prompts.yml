@@ -1,0 +1,5 @@
+mdtraj:
+    text: |
+        import mdtraj as md
+    comment: '#'
+    multiline_comment: '"""'
