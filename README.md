@@ -1,5 +1,7 @@
 # nlcc
 
+![Demo](./docs/demo.svg)
+
 ## Install
 
 ```sh
