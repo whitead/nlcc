@@ -19,3 +19,4 @@ pip install -e .
 * `ctrl-c` quit
 * `ctrl-x` write to file (same output as copy to clipboard)
 * `ctrl-l` load from file
+* `ctrl-n` update number of code responses

@@ -12,6 +12,21 @@ from.prompt import text_iter
 
 pretty.install()
 
+def update_n_responses(query, console):
+    try:
+        new_n_responses = int(query)
+    except ValueError as e:
+        console.print(
+            "\tFailed at setting n_responses with value:", query)
+        return None
+    if 1 > new_n_responses:
+        console.print(
+            "\tFailed at setting n_responses to value:", new_n_responses)
+        console.print("\tn_responses must be an integer >= 1")
+        return None
+    return new_n_responses
+
+
 def update_temperature(query, code_temp, nlp_temp, console):
     try:
         new_nlp_temp, new_code_temp = [float(s) for s in query.split(',')]
@@ -52,6 +67,7 @@ def main(input_file, engine, help, n_responses):
     console = Console()
     context = None
     adjustTemp = False
+    adjust_n_responses = False
     writeFile = False
     loadFile = False
     code_temp, nlp_temp = _DEFAULT_CODE_T, _DEFAULT_NLP_T
@@ -72,8 +88,8 @@ def main(input_file, engine, help, n_responses):
             console.print(f"Input file not found: {input_file}")
             return None
         query = open(input_file,'r').read()
-        context = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
-        if type(context) == list:
+        context, response_text = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
+        if len(response_text)>1:
             for idx, response in enumerate(context):
                 console.print(f"## Option {idx+1}")
                 console.print(Syntax(query, 'python',theme='monokai', line_numbers=True))
@@ -118,7 +134,7 @@ def main(input_file, engine, help, n_responses):
     def status(e):
         console.print()
         console.print(Markdown(
-            f'# 🧠 nlcc Status 🧠\n ## Parameters\n nlp🔥: `T = {nlp_temp}` \n\n code🧊: `T = {code_temp}`'))
+            f'# 🧠 nlcc Status 🧠\n ## Parameters\n - nlp🔥: `T = {nlp_temp}` \n- code🧊: `T = {code_temp}` \n- n_responses: `N = {n_responses}` '))
         if context:
             inspect(context, title='Context',  docs=False)
         console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
@@ -128,6 +144,11 @@ def main(input_file, engine, help, n_responses):
         context = None
         cli_prompt[0] = '👋'
         console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
+
+    def responses(e):
+        console.print("Enter an integer >= 1 to update the number of code responses")
+        nonlocal adjust_n_responses
+        adjust_n_responses = True
 
     def temperature(e):
         console.print(
@@ -153,15 +174,23 @@ def main(input_file, engine, help, n_responses):
         loadFile = True
         console.print(f'\nfilename:✍️📝>', end='')
 
-    kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute,
+    kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute, 'c-n': responses,
            'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write, 'c-l': load}
     for i, query in enumerate(text_iter(cli_prompt, kbs)):
         if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
             break
+        elif adjust_n_responses:
+            new_n = update_n_responses(query, console)
+            if new_n is not None:
+                n_responses = new_n
+            adjust_n_responses = False
+            continue
         elif adjustTemp:
-            code_temp, nlp_temp = update_temperature(
+            new_t = update_temperature(
                 query, code_temp, nlp_temp, console)
             adjustTemp = False
+            if new_t is not None:
+                code_temp, nlp_temp = new_t
             continue
         elif loadFile:
             if context is None: 
@@ -184,8 +213,11 @@ def main(input_file, engine, help, n_responses):
             context = guess_context(query, nlp_engine, nlp_temp)
             cli_prompt[0] = '|' + context.name
         else:
-            context = code_completion(
-                query, context, code_engine, T=code_temp)
-            console.print(Syntax(context.text, 'python',
-                                 theme='monokai', line_numbers=True))
+            context, response_list = code_completion(
+                query, context, code_engine, T=code_temp, n=n_responses)
+            for ridx, r in enumerate(response_list):
+                if len(response_list)>1:
+                    console.print(f"## Option {ridx+1}")
+                console.print(Syntax(r, 'python',
+                                     theme='monokai', line_numbers=True))
         # print_header(console, code_temp)

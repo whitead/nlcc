@@ -58,12 +58,8 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
         query = context.text + '\n' + \
             query if context is not None and len(context.text) > 0 else query
     r = engine(query, T=T, stop=context.prompt.stop, n=n)
-    if type(r) == str:
-        context.text = query + r
-        return context
-    else:
-        return r
-
+    context.text = query + r[0]
+    return context, r
 
 def guess_context(query, engine, T=0.3):
     r, _ = engine(query, T=T)

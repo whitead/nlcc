@@ -16,10 +16,7 @@ def code_engine(query, T=0.00, stop=None, n=1):
         stop=stop,
         n=n,
     )
-    if n==1:
-        return response['choices'][0]['text']
-    else:
-        return [r['text'] for r in response['choices']]
+    return [r['text'] for r in response['choices']]
 
 
 def nlp_engine(query, T=0.3):
