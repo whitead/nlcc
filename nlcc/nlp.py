@@ -53,10 +53,10 @@ def code_completion(query, context, engine, query_type=None, T=0.0):
         else:
             query = context.prompt.comment + ' ' + query + '\n'
         query = context.text + '\n' + \
-            query if len(context.text) > 0 else query
+            query if context is not None and len(context.text) > 0 else query
     elif query_type == 'code':
         query = context.text + '\n' + \
-            query if len(context.text) > 0 else query
+            query if context is not None and len(context.text) > 0 else query
     r = engine(query, T=T, stop=context.prompt.stop)
     context.text = query + r
     return context

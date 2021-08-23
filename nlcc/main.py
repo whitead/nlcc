@@ -1,10 +1,11 @@
+import os
 from rich.markdown import Markdown
 import pyperclip
 from rich.syntax import Syntax
 from rich.console import Console
 from rich import pretty
 from rich import inspect
-from .nlp import Context, guess_context, code_completion
+from .nlp import Context, Prompt, guess_context, code_completion
 import click
 from importlib_metadata import metadata
 from.prompt import text_iter
@@ -44,9 +45,10 @@ _DEFAULT_CODE_T = 0.0
 
 
 @click.command()
-@click.argument('engine', default='openai')
+@click.argument('input_file', default=None, required=False)
+@click.option('--engine', default='openai')
 @click.option('--help', is_flag=True)
-def main(engine, help):
+def main(input_file, engine, help):
     console = Console()
     context = None
     adjustTemp = False
@@ -56,9 +58,21 @@ def main(engine, help):
     if engine == 'openai':
         console.print('Using OpenAI Engine💰💰💰')
         from .openai import nlp_engine, code_engine
+    elif engine == 'huggingface':
+        console.print('Using Huggingface Engine')
+        from .huggingface import nlp_engine
+        from .openai import code_engine
     else:
         console.print('Unkown engine', engine)
         exit(1)
+
+    if input_file is not None and os.path.exists(input_file):
+        context = Context("",Prompt())
+        query = open(input_file,'r').read()
+        context = code_completion(query, context, code_engine, T=code_temp)
+        console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
+        exit()
+        
 
     # make a list, so it's pass by ref
     cli_prompt = ['👋']
