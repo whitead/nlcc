@@ -18,3 +18,4 @@ pip install -e .
 * `ctrl-u` print running status
 * `ctrl-c` quit
 * `ctrl-x` write to file (same output as copy to clipboard)
+* `ctrl-l` load from file

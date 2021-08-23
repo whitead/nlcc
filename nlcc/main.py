@@ -13,7 +13,6 @@ from.prompt import text_iter
 
 pretty.install()
 
-
 def update_temperature(query, code_temp, nlp_temp, console):
     try:
         new_nlp_temp, new_code_temp = [float(s) for s in query.split(',')]
@@ -55,6 +54,7 @@ def main(input_file, engine, help, n_responses):
     context = None
     adjustTemp = False
     writeFile = False
+    loadFile = False
     code_temp, nlp_temp = _DEFAULT_CODE_T, _DEFAULT_NLP_T
 
     if engine == 'openai':
@@ -68,8 +68,10 @@ def main(input_file, engine, help, n_responses):
         console.print('Unkown engine', engine)
         exit(1)
 
-    if input_file is not None and os.path.exists(input_file):
-        context = Context("",Prompt())
+    def query_file_text(input_file, context):
+        if not os.path.exists(input_file):
+            console.print(f"Input file not found: {input_file}")
+            return None
         query = open(input_file,'r').read()
         context = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
         if type(context) == openai.openai_object.OpenAIObject:
@@ -79,6 +81,11 @@ def main(input_file, engine, help, n_responses):
                 console.print(Syntax(response['text'], 'python',theme='monokai', line_numbers=True))
         else:
             console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
+            return context
+
+    if input_file is not None:
+        context = Context("",Prompt())
+        query_file_text(input_file, context)
         exit()
         
 
@@ -93,6 +100,7 @@ def main(input_file, engine, help, n_responses):
     console.print(Markdown(help_message))
     if(help):
         exit()
+
 
     def help(e):
         console.print()
@@ -141,8 +149,13 @@ def main(input_file, engine, help, n_responses):
         writeFile = True
         console.print(f'\nfilename:✍️📝>', end='')
 
+    def load(e):
+        nonlocal loadFile
+        loadFile = True
+        console.print(f'\nfilename:✍️📝>', end='')
+
     kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute,
-           'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write}
+           'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write, 'c-l': load}
     for i, query in enumerate(text_iter(cli_prompt, kbs)):
         if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
             break
@@ -151,6 +164,13 @@ def main(input_file, engine, help, n_responses):
                 query, code_temp, nlp_temp, console)
             adjustTemp = False
             continue
+        elif loadFile:
+            if context is None: 
+                context = Context("",Prompt())
+            context_returned = query_file_text(query, context)
+            if type(context_returned) == type(context):
+                context = context_returned
+            loadFile = False
         elif writeFile:
             if context:
                 with open(query, 'w') as f:
