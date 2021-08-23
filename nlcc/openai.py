@@ -4,7 +4,7 @@ import os
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
-def code_engine(query, T=0.00, stop=None):
+def code_engine(query, T=0.00, stop=None, n=1):
     response = openai.Completion.create(
         engine="davinci-codex",
         prompt=query,
@@ -13,9 +13,13 @@ def code_engine(query, T=0.00, stop=None):
         top_p=1,
         frequency_penalty=0.0,
         presence_penalty=0,
-        stop=stop
+        stop=stop,
+        n=n,
     )
-    return response['choices'][0]['text']
+    if n==1:
+        return response['choices'][0]['text']
+    else:
+        return response
 
 
 def nlp_engine(query, T=0.3):

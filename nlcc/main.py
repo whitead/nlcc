@@ -1,6 +1,7 @@
 import os
 from rich.markdown import Markdown
 import pyperclip
+import openai
 from rich.syntax import Syntax
 from rich.console import Console
 from rich import pretty
@@ -46,9 +47,10 @@ _DEFAULT_CODE_T = 0.0
 
 @click.command()
 @click.argument('input_file', default=None, required=False)
+@click.option('--n_responses', default=1)
 @click.option('--engine', default='openai')
 @click.option('--help', is_flag=True)
-def main(input_file, engine, help):
+def main(input_file, engine, help, n_responses):
     console = Console()
     context = None
     adjustTemp = False
@@ -69,8 +71,14 @@ def main(input_file, engine, help):
     if input_file is not None and os.path.exists(input_file):
         context = Context("",Prompt())
         query = open(input_file,'r').read()
-        context = code_completion(query, context, code_engine, T=code_temp)
-        console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
+        context = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
+        if type(context) == openai.openai_object.OpenAIObject:
+            for idx, response in enumerate(context['choices']):
+                console.print(f"## Option {idx}")
+                console.print(Syntax(query, 'python',theme='monokai', line_numbers=True))
+                console.print(Syntax(response['text'], 'python',theme='monokai', line_numbers=True))
+        else:
+            console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
         exit()
         
 

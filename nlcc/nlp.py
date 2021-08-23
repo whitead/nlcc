@@ -40,7 +40,7 @@ def guess_query_type(query):
     return 'code'
 
 
-def code_completion(query, context, engine, query_type=None, T=0.0):
+def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
     # count newlines to guess if we should insert comments (and how)
     if query_type is None:
         query_type = guess_query_type(query)
@@ -57,9 +57,12 @@ def code_completion(query, context, engine, query_type=None, T=0.0):
     elif query_type == 'code':
         query = context.text + '\n' + \
             query if context is not None and len(context.text) > 0 else query
-    r = engine(query, T=T, stop=context.prompt.stop)
-    context.text = query + r
-    return context
+    r = engine(query, T=T, stop=context.prompt.stop, n=n)
+    if type(r) == str:
+        context.text = query + r
+        return context
+    else:
+        return r
 
 
 def guess_context(query, engine, T=0.3):
