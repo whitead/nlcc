@@ -179,7 +179,8 @@ def main(input_file, engine, help, n_responses):
                         f'✨wrote to {query}✨')
             else:
                 console.print('🤔 nothing to write')
-                writeFile = False
+            writeFile = False
+
         elif context is None:
             context = guess_context(query, nlp_engine, nlp_temp)
             cli_prompt[0] = '|' + context.name
