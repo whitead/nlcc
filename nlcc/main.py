@@ -1,7 +1,6 @@
 import os
 from rich.markdown import Markdown
 import pyperclip
-import openai
 from rich.syntax import Syntax
 from rich.console import Console
 from rich import pretty
@@ -74,11 +73,11 @@ def main(input_file, engine, help, n_responses):
             return None
         query = open(input_file,'r').read()
         context = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
-        if type(context) == openai.openai_object.OpenAIObject:
-            for idx, response in enumerate(context['choices']):
-                console.print(f"## Option {idx}")
+        if type(context) == list:
+            for idx, response in enumerate(context):
+                console.print(f"## Option {idx+1}")
                 console.print(Syntax(query, 'python',theme='monokai', line_numbers=True))
-                console.print(Syntax(response['text'], 'python',theme='monokai', line_numbers=True))
+                console.print(Syntax(response, 'python',theme='monokai', line_numbers=True))
         else:
             console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
             return context
