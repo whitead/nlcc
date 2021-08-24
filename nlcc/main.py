@@ -243,5 +243,5 @@ def eval(yaml_files, n, engine):
     print('### Global Parameters')
     print('* Engine = ', engine)
     print('* n = ', n)
-    print('## Test Report')
+    print('## Results')
     print(tabulate(table, ['Test'] + [f'Run {i}' for i in range(n)], tablefmt="github"))
