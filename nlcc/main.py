@@ -167,7 +167,7 @@ def main(input_file, engine, help, n_responses):
     def temperature(e):
         cli_prompt.append('|🔥🧊')
         console.print(
-            f'\nEnter as 0.7,0.2. Currently nlp🔥:{nlp_temp} code🧊: {code_temp}')
+            f'\nEnter as 0.7,0.2. Currently nlp🔥:{nlp_temp} code🧊: {code_temp}', end='')
         console.print(f'\nnlcc{cli_prompt[-1]}:>', end='')
         input_mode.append(Modes.TEMPERATURE)
 
@@ -191,6 +191,7 @@ def main(input_file, engine, help, n_responses):
     kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute, 'c-n': responses,
            'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write, 'c-l': read}
     for i, query in enumerate(text_iter(cli_prompt, kbs)):
+
         if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
             break
         elif input_mode[-1] == Modes.SELECT_NRESPONSE:

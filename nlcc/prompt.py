@@ -2,6 +2,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit import print_formatted_text
 
 
 def text_iter(cli_prompt, extra_kbs):
@@ -29,5 +30,6 @@ def text_iter(cli_prompt, extra_kbs):
         key_bindings=kb
     )
     while True:
-        q = session.prompt(f'nlcc{cli_prompt[-1]}:>')
+        print_formatted_text(f'nlcc{cli_prompt[-1]}:>', end='')
+        q = session.prompt('')
         yield q
