@@ -239,4 +239,9 @@ def eval(yaml_files, n, engine):
     for y in yaml_files:
         report = eval_single(y, engine=code_engine, n=n)
         table.append([report['name']] + ['Pass' if r else 'Fail' for r in report['result']])
+    print('## Test Report')
+    print('### Global Parameters')
+    print('* Engine = ', engine)
+    print('* n = ', n)
+    print('## Test Report')
     print(tabulate(table, ['Test'] + [f'Run {i}' for i in range(n)], tablefmt="github"))
