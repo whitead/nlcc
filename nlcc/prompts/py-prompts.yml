@@ -5,3 +5,19 @@ numpy:
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - def
+        - '"""'
+        - '#'
+python:
+    text: |
+        import math
+        import sys
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - def
+        - '"""'
+        - '#'

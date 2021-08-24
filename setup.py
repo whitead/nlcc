@@ -20,13 +20,14 @@ setup(name='nlcc',
           'importlib-metadata',
           'numpy', 'pyyaml',
           'openai', 'pyperclip',
-          'prompt_toolkit',
+          'prompt_toolkit', 'tabulate',
           'rich'],
       test_suite='tests',
       zip_safe=True,
       entry_points='''
         [console_scripts]
         nlcc=nlcc.main:main
+        nlcc-eval=nlcc.main:eval
             ''',
       package_data={'nlcc': ['prompts/*yml']},
       long_description=long_description,

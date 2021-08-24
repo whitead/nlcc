@@ -1,3 +1,4 @@
+from nlcc.openai import code_engine, nlp_engine
 import os
 from rich.markdown import Markdown
 import pyperclip
@@ -9,6 +10,7 @@ from .nlp import Context, Prompt, guess_context, code_completion
 import click
 from importlib_metadata import metadata
 from.prompt import text_iter, Modes, PromptManager
+from .eval import eval_single
 
 pretty.install()
 
@@ -54,9 +56,20 @@ def process_temperature(query, code_temp, nlp_temp, console):
     return code_temp, nlp_temp
 
 
+def get_engine(engine, console=None):
+    if engine == 'openai':
+        if console: console.print('Using OpenAI Engine💰💰💰')
+        from .openai import nlp_engine, code_engine
+    elif engine == 'huggingface':
+        if console: console.print('Using Huggingface Engine🤗🤗🤗')
+        from .huggingface import nlp_engine
+    else:
+        if console: console.print('Unkown engine', engine)
+        exit(1)
+    return nlp_engine, code_engine
+
 _DEFAULT_NLP_T = 0.3
 _DEFAULT_CODE_T = 0.0
-
 
 @click.command()
 @click.argument('input_file', default=None, required=False)
@@ -69,15 +82,7 @@ def main(input_file, engine, help, n_responses):
     pm = PromptManager()
     code_temp, nlp_temp = _DEFAULT_CODE_T, _DEFAULT_NLP_T
 
-    if engine == 'openai':
-        console.print('Using OpenAI Engine💰💰💰')
-        from .openai import nlp_engine, code_engine
-    elif engine == 'huggingface':
-        console.print('Using Huggingface Engine🤗🤗🤗')
-        from .huggingface import nlp_engine
-    else:
-        console.print('Unkown engine', engine)
-        exit(1)
+    nlp_engine, code_engine = get_engine(engine, console)
 
     def query_file_text(input_file, context):
         if not os.path.exists(input_file):
@@ -220,4 +225,18 @@ def main(input_file, engine, help, n_responses):
         # reset mode
         pm.pop()
         if len(pm) == 0:
-            pm.push('|' + context.name if len(context.name) > 1 else 'context-free', Modes.QUERY)
+            pm.push(context.name if len(context.name) > 1 else 'context-free', Modes.QUERY)
+
+
+@click.command()
+@click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
+@click.option('--n', default=1, help='number of respones')
+@click.option('--engine', default='openai')
+def eval(yaml_files, n, engine):
+    from tabulate import tabulate
+    nlp_engine, code_engine = get_engine(engine)
+    table = []
+    for y in yaml_files:
+        report = eval_single(y, engine=code_engine, n=n)
+        table.append([report['name']] + ['Pass' if r else 'Fail' for r in report['result']])
+    print(tabulate(table, ['Test'] + [f'Run {i}' for i in range(n)], tablefmt="github"))
