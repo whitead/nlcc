@@ -15,7 +15,7 @@ pip install -e .
 * `ctrl-o` reset context
 * `ctrl-z` execute python code
 * `ctrl-t` adjust temperature
-* `ctrl-u` print running status
+* `ctrl-u` status
 * `ctrl-c` quit
 * `ctrl-x` write to file (same output as copy to clipboard)
 * `ctrl-l` load from file

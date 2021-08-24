@@ -4,3 +4,4 @@ numpy:
         import matplotlib.pyplot as plt
     comment: '#'
     multiline_comment: '"""'
+    language: python

@@ -29,5 +29,5 @@ def text_iter(cli_prompt, extra_kbs):
         key_bindings=kb
     )
     while True:
-        q = session.prompt(f'nlcc{cli_prompt[0]}:>')
+        q = session.prompt(f'nlcc{cli_prompt[-1]}:>')
         yield q
