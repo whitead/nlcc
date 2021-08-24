@@ -3,3 +3,4 @@ mdtraj:
         import mdtraj as md
     comment: '#'
     multiline_comment: '"""'
+    language: python

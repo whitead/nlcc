@@ -8,11 +8,11 @@ from rich import inspect
 from .nlp import Context, Prompt, guess_context, code_completion
 import click
 from importlib_metadata import metadata
-from.prompt import text_iter
+from.prompt import text_iter, Modes, PromptManager
 
 pretty.install()
 
-def update_n_responses(query, console):
+def process_n_response(query, console):
     try:
         new_n_responses = int(query)
     except ValueError as e:
@@ -27,7 +27,7 @@ def update_n_responses(query, console):
     return new_n_responses
 
 
-def update_temperature(query, code_temp, nlp_temp, console):
+def process_temperature(query, code_temp, nlp_temp, console):
     try:
         new_nlp_temp, new_code_temp = [float(s) for s in query.split(',')]
     except (ValueError, IndexError) as e:
@@ -65,20 +65,16 @@ _DEFAULT_CODE_T = 0.0
 @click.option('--help', is_flag=True)
 def main(input_file, engine, help, n_responses):
     console = Console()
-    context = None
-    adjustTemp = False
-    adjust_n_responses = False
-    writeFile = False
-    loadFile = False
+    context = Context("", Prompt())
+    pm = PromptManager()
     code_temp, nlp_temp = _DEFAULT_CODE_T, _DEFAULT_NLP_T
 
     if engine == 'openai':
         console.print('Using OpenAI Engine💰💰💰')
         from .openai import nlp_engine, code_engine
     elif engine == 'huggingface':
-        console.print('Using Huggingface Engine')
+        console.print('Using Huggingface Engine🤗🤗🤗')
         from .huggingface import nlp_engine
-        from .openai import code_engine
     else:
         console.print('Unkown engine', engine)
         exit(1)
@@ -87,25 +83,25 @@ def main(input_file, engine, help, n_responses):
         if not os.path.exists(input_file):
             console.print(f"Input file not found: {input_file}")
             return None
-        query = open(input_file,'r').read()
-        context, response_text = code_completion(query, context, code_engine, T=code_temp, n=n_responses)
-        if len(response_text)>1:
+        query = open(input_file, 'r').read()
+        context, response_text = code_completion(
+            query, context, code_engine, T=code_temp, n=n_responses)
+        if len(response_text) > 1:
             for idx, response in enumerate(context):
                 console.print(f"## Option {idx+1}")
-                console.print(Syntax(query, 'python',theme='monokai', line_numbers=True))
-                console.print(Syntax(response, 'python',theme='monokai', line_numbers=True))
+                console.print(
+                    Syntax(query, context.prompt.language, theme='monokai', line_numbers=True))
+                console.print(Syntax(response, context.prompt.language,
+                                     theme='monokai', line_numbers=True))
         else:
-            console.print(Syntax(context.text, 'python',theme='monokai', line_numbers=True))
+            console.print(Syntax(context.text, context.prompt.language,
+                                 theme='monokai', line_numbers=True))
             return context
 
     if input_file is not None:
-        context = Context("",Prompt())
+        context = Context("", Prompt())
         query_file_text(input_file, context)
         exit()
-        
-
-    # make a list, so it's pass by ref
-    cli_prompt = ['👋']
 
     # welcome message
     readme = metadata('nlcc')['Description']
@@ -116,108 +112,112 @@ def main(input_file, engine, help, n_responses):
     if(help):
         exit()
 
-
     def help(e):
         console.print()
         console.print(Markdown(help_message))
-        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
 
     # make it here to have access to context
     def make_copy(e):
         if context is not None:
             pyperclip.copy(context.text)
-            console.print('\n✨copied✨\n' + f'nlcc{cli_prompt[0]}:>', end='')
+            console.print('\n✨copied✨')
         else:
-            console.print('\n🤔 nothing to copy\n' +
-                          f'nlcc{cli_prompt[0]}:>', end='')
+            console.print('\n🤔 nothing to copy')
 
     def status(e):
         console.print()
         console.print(Markdown(
-            f'# 🧠 nlcc Status 🧠\n ## Parameters\n - nlp🔥: `T = {nlp_temp}` \n- code🧊: `T = {code_temp}` \n- n_responses: `N = {n_responses}` '))
-        if context:
-            inspect(context, title='Context',  docs=False)
-        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
+            f'# 🧠 nlcc Status 🧠\n - nlp🔥: `T = {nlp_temp}` \n- code🧊: `T = {code_temp}` \n- n_responses🤏: `N = {n_responses}` '))
+        inspect(context, title='Context',  docs=False)
+        if len(pm) > 1:
+            inspect(pm, title='Input Mode', docs=False)
 
     def reset_context(e):
         nonlocal context
-        context = None
-        cli_prompt[0] = '👋'
-        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
+        context = Context("", Prompt())
+        pm.pop()
+        pm.push('👋', Modes.SELECT_CONTEXT)
 
     def responses(e):
-        console.print("Enter an integer >= 1 to update the number of code responses")
-        nonlocal adjust_n_responses
-        adjust_n_responses = True
+        pm.push('num_responses🥳', Modes.SELECT_NRESPONSE)
 
     def temperature(e):
+        pm.push('🔥🧊', Modes.TEMPERATURE)
         console.print(
-            f'\nEnter as 0.7,0.2. Currently nlp🔥:{nlp_temp} code🧊: {code_temp}')
-        console.print(f'🔥🧊:>', end='')
-        nonlocal adjustTemp
-        adjustTemp = True
+            f'\nEnter as 0.7,0.2. Currently nlp🔥:{nlp_temp} code🧊: {code_temp}', end='')
 
     def execute(e):
         g = {}
         console.print()
         exec(context.text, g)
-        console.print(f'\nnlcc{cli_prompt[0]}:>', end='')
-        # pretty.pprint(g)
 
     def write(e):
-        nonlocal writeFile
-        writeFile = True
-        console.print(f'\nfilename:✍️📝>', end='')
+        pm.push('filename✍️📝', Modes.WRITE_FILE)
 
-    def load(e):
-        nonlocal loadFile
-        loadFile = True
-        console.print(f'\nfilename:✍️📝>', end='')
+    def read(e):
+        pm.push('filename👀📝', Modes.READ_FILE)
 
     kbs = {'c-w': make_copy, 'c-o': reset_context, 'c-z': execute, 'c-n': responses,
-           'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write, 'c-l': load}
-    for i, query in enumerate(text_iter(cli_prompt, kbs)):
+           'c-q': help, 'c-u': status, 'c-t': temperature, 'c-x': write, 'c-l': read}
+    for i, query in enumerate(text_iter(pm, kbs)):
+
         if query.lower() == 'exit' or query.lower() == 'q' or query.lower() == 'quit':
             break
-        elif adjust_n_responses:
-            new_n = update_n_responses(query, console)
+        elif pm.peek_mode() == Modes.SELECT_NRESPONSE:
+            new_n = process_n_response(query, console)
             if new_n is not None:
                 n_responses = new_n
-            adjust_n_responses = False
-            continue
-        elif adjustTemp:
-            new_t = update_temperature(
+        elif pm.peek_mode() == Modes.TEMPERATURE:
+            new_t = process_temperature(
                 query, code_temp, nlp_temp, console)
-            adjustTemp = False
             if new_t is not None:
                 code_temp, nlp_temp = new_t
-            continue
-        elif loadFile:
-            if context is None: 
-                context = Context("",Prompt())
+        elif pm.peek_mode() == Modes.SELECT_CONTEXT:
+            context = guess_context(query, nlp_engine, nlp_temp)
+        elif pm.peek_mode() == Modes.READ_FILE:
             context_returned = query_file_text(query, context)
             if type(context_returned) == type(context):
                 context = context_returned
-            loadFile = False
-        elif writeFile:
+        elif pm.peek_mode() == Modes.WRITE_FILE:
             if context:
-                with open(query, 'w') as f:
-                    f.write(context.text + '\n')
-                    console.print(
-                        f'✨wrote to {query}✨')
+                if query and os.path.normpath('(path-to-wiki)/foo/bar.txt').startswith('(path-to-wiki)'):
+                    with open(query, 'w') as f:
+                        f.write(context.text + '\n')
+                        console.print(
+                            f'✨wrote to {query}✨')
+                else:
+                    console.print(f'🤔 Not sure about this filepath: {query}')
             else:
                 console.print('🤔 nothing to write')
-            writeFile = False
-
-        elif context is None:
-            context = guess_context(query, nlp_engine, nlp_temp)
-            cli_prompt[0] = '|' + context.name
-        else:
-            context, response_list = code_completion(
-                query, context, code_engine, T=code_temp, n=n_responses)
-            for ridx, r in enumerate(response_list):
-                if len(response_list)>1:
-                    console.print(f"## Option {ridx+1}")
-                console.print(Syntax(r, 'python',
+        elif pm.peek_mode() == Modes.SELECT_RESPONSE:
+            try:
+                i = int(query) - 1
+                context.text = context.responses[i]
+                console.print(Syntax(context.text, context.prompt.language,
                                      theme='monokai', line_numbers=True))
-        # print_header(console, code_temp)
+                context.responses = None
+            except Exception as e:
+                console.print(e)
+                console.print('🤮 what was that? Please pick response')
+                continue
+        else:
+            context = code_completion(
+                query, context, code_engine, T=code_temp, n=n_responses)
+            if len(context.responses) == 1:
+                context.text = context.responses[0]
+                console.print(Syntax(context.text, context.prompt.language,
+                                     theme='monokai', line_numbers=True))
+                context.responses = None
+            else:
+                for ridx, r in enumerate(context.responses):
+                    console.print(f"## Option {ridx+1}")
+                    console.print(Syntax(r, context.prompt.language,
+                                         theme='monokai', line_numbers=True))
+                pm.push('🤔which response', Modes.SELECT_RESPONSE)
+                # do not want pop
+                continue
+
+        # reset mode
+        pm.pop()
+        if len(pm) == 0:
+            pm.push('|' + context.name if len(context.name) > 1 else 'context-free', Modes.QUERY)

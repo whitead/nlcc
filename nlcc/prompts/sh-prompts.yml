@@ -6,9 +6,11 @@ gromacs:
     comment: '#'
     stop:
       - "\n"
+    language: bash
 bash:
   text: |
       #!/bin/bash
   comment: '#'
   stop:
     - "\n"
+  language: bash

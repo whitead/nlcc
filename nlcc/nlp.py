@@ -13,6 +13,7 @@ class Prompt:
     comment: str = '# '
     multiline_comment: str = None
     stop: list = None
+    language: str = None
 
 
 @dataclass
@@ -21,6 +22,8 @@ class Context:
     prompt: Prompt = None
     text: str = ''
     T: float = 0.0
+    responses: tuple = None
+    query_type: str = None
 
 
 # load prompts on import
@@ -53,13 +56,15 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
         else:
             query = context.prompt.comment + ' ' + query + '\n'
         query = context.text + '\n' + \
-            query if context is not None and len(context.text) > 0 else query
+            query if len(context.text) > 0 else query
     elif query_type == 'code':
         query = context.text + '\n' + \
-            query if context is not None and len(context.text) > 0 else query
+            query if len(context.text) > 0 else query
+    context.query_type = query_type
     r = engine(query, T=T, stop=context.prompt.stop, n=n)
-    context.text = query + r[0]
-    return context, r
+    context.responses = tuple([query + ri for ri in r])
+    return context
+
 
 def guess_context(query, engine, T=0.3):
     r, _ = engine(query, T=T)
