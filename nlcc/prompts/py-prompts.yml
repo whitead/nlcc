@@ -6,7 +6,6 @@ numpy:
     multiline_comment: '"""'
     language: python
     stop:
-        - def
         - '"""'
         - '#'
 python:
@@ -18,6 +17,5 @@ python:
     multiline_comment: '"""'
     language: python
     stop:
-        - def
         - '"""'
         - '#'
