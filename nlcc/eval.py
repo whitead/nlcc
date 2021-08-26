@@ -35,5 +35,6 @@ def eval_single(path, **kwargs):
     # make new console with info
     console = Console()
     console.print(inspect(context))
-    info_html = console.export_html(code_format="<pre style="font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace">{code}</pre>")
+    info_html = console.export_html(
+        code_format="<pre style=\"font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace\">{code}</pre>")
     return result, info_html
