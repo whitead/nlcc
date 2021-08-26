@@ -96,19 +96,16 @@ def main(input_file, engine, help, n_responses):
             console.print(f"Input file not found: {input_file}")
             return None
         query = open(input_file, 'r').read()
-        context, response_text = code_completion(
+        context = code_completion(
             query, context, code_engine, T=code_temp, n=n_responses)
-        if len(response_text) > 1:
-            for idx, response in enumerate(context):
+        response_text = context.responses
+        for idx, response in enumerate(response_text):
+            if len(response_text)>1:
                 console.print(f"## Option {idx+1}")
-                console.print(
-                    Syntax(query, context.prompt.language, theme='monokai', line_numbers=True))
-                console.print(Syntax(response, context.prompt.language,
-                                     theme='monokai', line_numbers=True))
-        else:
-            console.print(Syntax(context.text, context.prompt.language,
-                                 theme='monokai', line_numbers=True))
-            return context
+            console.print(Syntax(query, context.prompt.language, theme='monokai', line_numbers=True))
+            console.print(Syntax(response, context.prompt.language,
+                             theme='monokai', line_numbers=True))
+        return context
 
     if input_file is not None:
         context = Context("", Prompt())
