@@ -1,3 +1,4 @@
+from .eval import eval_single
 from nlcc.openai import code_engine, nlp_engine
 import os
 from rich.markdown import Markdown
@@ -10,9 +11,9 @@ from .nlp import Context, Prompt, guess_context, code_completion
 import click
 from importlib_metadata import metadata
 from.prompt import text_iter, Modes, PromptManager
-from .eval import eval_single
 
 pretty.install()
+
 
 def process_n_response(query, console):
     try:
@@ -58,18 +59,23 @@ def process_temperature(query, code_temp, nlp_temp, console):
 
 def get_engine(engine, console=None):
     if engine == 'openai':
-        if console: console.print('Using OpenAI Engine💰💰💰')
+        if console:
+            console.print('Using OpenAI Engine💰💰💰')
         from .openai import nlp_engine, code_engine
     elif engine == 'huggingface':
-        if console: console.print('Using Huggingface Engine🤗🤗🤗')
+        if console:
+            console.print('Using Huggingface Engine🤗🤗🤗')
         from .huggingface import nlp_engine
     else:
-        if console: console.print('Unkown engine', engine)
+        if console:
+            console.print('Unkown engine', engine)
         exit(1)
     return nlp_engine, code_engine
 
+
 _DEFAULT_NLP_T = 0.3
 _DEFAULT_CODE_T = 0.0
+
 
 @click.command()
 @click.argument('input_file', default=None, required=False)
@@ -225,7 +231,8 @@ def main(input_file, engine, help, n_responses):
         # reset mode
         pm.pop()
         if len(pm) == 0:
-            pm.push(context.name if len(context.name) > 1 else 'context-free', Modes.QUERY)
+            pm.push(context.name if len(context.name) >
+                    1 else 'context-free', Modes.QUERY)
 
 
 @click.command()
@@ -238,10 +245,12 @@ def eval(yaml_files, n, engine):
     table = []
     for y in yaml_files:
         report = eval_single(y, engine=code_engine, n=n)
-        table.append([report['name']] + ['Pass' if r else 'Fail' for r in report['result']])
+        table.append([report['name']] +
+                     ['Pass' if r else 'Fail' for r in report['result']])
     print('## Test Report')
     print('### Global Parameters')
     print('* Engine = ', engine)
     print('* n = ', n)
     print('## Results')
-    print(tabulate(table, ['Test'] + [f'Run {i}' for i in range(n)], tablefmt="github"))
+    print(tabulate(table, ['Test'] +
+                   [f'Run {i}' for i in range(n)], tablefmt="github"))

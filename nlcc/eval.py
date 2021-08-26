@@ -2,13 +2,15 @@ import yaml
 from . import nlp
 import os
 from rich import inspect
+from rich.console import Console
 
 
 def eval_single(path, **kwargs):
     with open(path, 'r') as f:
         config = yaml.safe_load(f.read())
     try:
-        context = nlp.Context(name=config['name'], prompt=nlp.prompts[config['context']])
+        context = nlp.Context(
+            name=config['name'], prompt=nlp.prompts[config['context']])
     except Exception as e:
         print('Could not parse file')
         inspect(config, docs=False, methods=False)
@@ -29,4 +31,9 @@ def eval_single(path, **kwargs):
             print('Your eval code must have a variable called result')
         runs.append(g['result'])
     result = {'name': config['name'], 'context': context, 'result': runs}
-    return result
+
+    # make new console with info
+    console = Console()
+    console.print(inspect(context))
+    info_html = console.export_html(code_format="<pre style="font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace">{code}</pre>")
+    return result, info_html
