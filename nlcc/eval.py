@@ -43,7 +43,7 @@ def eval_single(path, **kwargs):
 
 def obj2html(o):
     # make new console with info
-    reconfigure(record=True, quiet=True)
+    reconfigure(record=True, file=open(os.devnull, 'w'))
     console = get_console()
     # with console.capture() as capture:
     console.print(inspect(o))
