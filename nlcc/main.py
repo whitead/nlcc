@@ -244,6 +244,8 @@ def eval(yaml_files, n, engine):
     collapsables = []
     for y in yaml_files:
         report, info = eval_single(y, engine=code_engine, n=n)
+        if report is None:
+            exit(1)
         collapsables.append(f'''
 <details>
     <summary>{report['name']}</summary>

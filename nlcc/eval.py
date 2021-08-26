@@ -12,9 +12,10 @@ def eval_single(path, **kwargs):
         context = nlp.Context(
             name=config['name'], prompt=nlp.prompts[config['context']])
     except Exception as e:
-        print('Could not parse file')
+        print(f'ERROR: Could not parse file {f.name}')
+        print(e)
         inspect(config, docs=False, methods=False)
-        return None
+        return None, None
     dir = os.path.dirname(path)
     with open(os.path.join(dir, config['prompt']), 'r') as f:
         query = f.read()
@@ -27,7 +28,8 @@ def eval_single(path, **kwargs):
         test_code = f.read()
 
     runs = []
-    for r in context.responses:
+    exceptions = []
+    for i,r in enumerate(context.responses):
         g = {}
         try:
             exec(r + '\n' + test_code, g)
@@ -35,10 +37,11 @@ def eval_single(path, **kwargs):
                 print('Your eval code must have a variable called result')
             runs.append(g['result'])
         except Exception as e:
+            exceptions.append(f'\n### Exception on response {i}\n\n ```python \n{str(e)}\n```\n')
             runs.append(False)
     result = {'name': config['name'], 'context': context, 'result': runs}
 
-    return result, obj2html(context)
+    return result, '\n\n'.join(exceptions) + obj2html(context)
 
 
 def obj2html(o):
