@@ -26,7 +26,6 @@ def eval_single(path, **kwargs):
 
     with open(os.path.join(dir, config['test']), 'r') as f:
         test_code = f.read()
-
     runs = []
     exceptions = []
     for i,r in enumerate(context.responses):
@@ -34,7 +33,7 @@ def eval_single(path, **kwargs):
         try:
             exec(r + '\n' + test_code, g)
             if 'result' not in g:
-                print('Your eval code must have a variable called result')
+                exceptions.append(f'\n### Exception on response {i}\n You must have variable `result` defined. \n')
             runs.append(g['result'])
         except Exception as e:
             exceptions.append(f'\n### Exception on response {i}\n\n ```python \n{str(e)}\n```\n')

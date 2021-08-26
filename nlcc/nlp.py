@@ -44,6 +44,8 @@ def guess_query_type(query):
 
 
 def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
+    if len(context.text) == 0:
+        context.text = context.prompt.text
     # count newlines to guess if we should insert comments (and how)
     if query_type is None:
         query_type = guess_query_type(query)
