@@ -262,7 +262,7 @@ def eval(yaml_files, n, engine):
     print('## Results')
     print(tabulate(table, ['Test'] +
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
-    print('## Contexts')
+    print('## Test Details')
     print('\n'.join(collapsables))
 
 
