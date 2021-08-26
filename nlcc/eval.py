@@ -1,7 +1,7 @@
 import yaml
 from . import nlp
 import os
-from rich import inspect
+from rich import inspect, reconfigure, get_console
 from rich.console import Console
 
 
@@ -18,6 +18,9 @@ def eval_single(path, **kwargs):
     dir = os.path.dirname(path)
     with open(os.path.join(dir, config['prompt']), 'r') as f:
         query = f.read()
+    # TODO Better way?
+    # Make it so we can only get one function
+    context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
     with open(os.path.join(dir, config['test']), 'r') as f:
@@ -26,15 +29,24 @@ def eval_single(path, **kwargs):
     runs = []
     for r in context.responses:
         g = {}
-        exec(r + '\n' + test_code, g)
-        if 'result' not in g:
-            print('Your eval code must have a variable called result')
-        runs.append(g['result'])
+        try:
+            exec(r + '\n' + test_code, g)
+            if 'result' not in g:
+                print('Your eval code must have a variable called result')
+            runs.append(g['result'])
+        except Exception as e:
+            runs.append(False)
     result = {'name': config['name'], 'context': context, 'result': runs}
 
+    return result, obj2html(context)
+
+
+def obj2html(o):
     # make new console with info
-    console = Console()
-    console.print(inspect(context))
-    info_html = console.export_html(
-        code_format="<pre style=\"font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace\">{code}</pre>")
-    return result, info_html
+    reconfigure(record=True)
+    console = get_console()
+    # with console.capture() as capture:
+    console.print(inspect(o))
+    info_html = console.export_html(inline_styles=True,
+                                    code_format="<pre style=\"font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace\">{code}</pre>")
+    return info_html

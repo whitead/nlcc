@@ -1,4 +1,4 @@
-from .eval import eval_single
+from .eval import eval_single, obj2html
 from nlcc.openai import code_engine, nlp_engine
 import os
 from rich.markdown import Markdown
@@ -8,9 +8,10 @@ from rich.console import Console
 from rich import pretty
 from rich import inspect
 from .nlp import Context, Prompt, guess_context, code_completion
+from . import nlp
 import click
 from importlib_metadata import metadata
-from.prompt import text_iter, Modes, PromptManager
+from .prompt import text_iter, Modes, PromptManager
 
 pretty.install()
 
@@ -243,8 +244,15 @@ def eval(yaml_files, n, engine):
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
     table = []
+    collapsables = []
     for y in yaml_files:
-        report = eval_single(y, engine=code_engine, n=n)
+        report, info = eval_single(y, engine=code_engine, n=n)
+        collapsables.append(f'''
+<details>
+    <summary>{report['name']}</summary>
+    {info}
+</details>
+        ''')
         table.append([report['name']] +
                      ['Pass' if r else 'Fail' for r in report['result']])
     print('## Test Report')
@@ -254,3 +262,19 @@ def eval(yaml_files, n, engine):
     print('## Results')
     print(tabulate(table, ['Test'] +
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
+    print('## Contexts')
+    print('\n'.join(collapsables))
+
+
+@click.command()
+def prompts():
+    collapsables = []
+    for n, p in nlp.prompts.items():
+        collapsables.append(f'''
+<details>
+    <summary>{n}</summary>
+    {obj2html(p)}
+</details>
+        ''')
+    pyperclip.copy('\n'.join(collapsables))
+    print('I put them on your clipboard. Hopefully you wanted that!!')
