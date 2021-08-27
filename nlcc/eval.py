@@ -21,22 +21,25 @@ def eval_single(path, **kwargs):
         query = f.read()
     # TODO Better way?
     # Make it so we can only get one function
-    context.prompt.stop = ['def'] + context.prompt.stop
+    if 'def' not in context.prompt.stop:
+        context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
     with open(os.path.join(dir, config['test']), 'r') as f:
         test_code = f.read()
     runs = []
     exceptions = []
-    for i,r in enumerate(context.responses):
+    for i, r in enumerate(context.responses):
         g = {}
         try:
             exec(r + '\n' + test_code, g)
             if 'result' not in g:
-                exceptions.append(f'\n### Exception on response {i}\n You must have variable `result` defined. \n')
+                exceptions.append(
+                    f'\n### Exception on response {i}\n You must have variable `result` defined. \n')
             runs.append(g['result'])
         except Exception as e:
-            exceptions.append(f'\n### Exception on response {i}\n\n ```python \n{str(e)}\n```\n')
+            exceptions.append(
+                f'\n### Exception on response {i}\n\n ```python \n{str(e)}\n```\n')
             runs.append(False)
     result = {'name': config['name'], 'context': context, 'result': runs}
 
