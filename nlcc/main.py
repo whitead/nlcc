@@ -100,11 +100,12 @@ def main(input_file, engine, help, n_responses):
             query, context, code_engine, T=code_temp, n=n_responses)
         response_text = context.responses
         for idx, response in enumerate(response_text):
-            if len(response_text)>1:
+            if len(response_text) > 1:
                 console.print(f"## Option {idx+1}")
-            console.print(Syntax(query, context.prompt.language, theme='monokai', line_numbers=True))
+            console.print(Syntax(query, context.prompt.language,
+                                 theme='monokai', line_numbers=True))
             console.print(Syntax(response, context.prompt.language,
-                             theme='monokai', line_numbers=True))
+                                 theme='monokai', line_numbers=True))
         return context
 
     if input_file is not None:
@@ -237,13 +238,14 @@ def main(input_file, engine, help, n_responses):
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
-def eval(yaml_files, n, engine):
+@click.option('--temperature', default=0.2)
+def eval(yaml_files, n, engine, temperature):
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
     table = []
     collapsables = []
     for y in yaml_files:
-        report, info = eval_single(y, engine=code_engine, n=n)
+        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
         if report is None:
             exit(1)
         collapsables.append(f'''
