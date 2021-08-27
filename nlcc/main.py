@@ -238,14 +238,24 @@ def main(input_file, engine, help, n_responses):
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
+@click.option('--terminal',default=False,is_flag=True)
 @click.option('--temperature', default=0.2)
-def eval(yaml_files, n, engine, temperature):
+def eval(yaml_files, n, engine, temperature, terminal):
+    if terminal is True:
+        console = Console()
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
     table = []
     collapsables = []
     for y in yaml_files:
         report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        if terminal is True:
+            context = report["context"] 
+            for ridx, r in enumerate(context.responses):
+                console.print(f"## Option {ridx+1}")
+                console.print(Syntax(r, context.prompt.language,
+                        theme='monokai', line_numbers=True))
+            continue
         if report is None:
             exit(1)
         collapsables.append(f'''
@@ -256,6 +266,8 @@ def eval(yaml_files, n, engine, temperature):
         ''')
         table.append([report['name']] +
                      ['Pass' if r else 'Fail' for r in report['result']])
+    if terminal is True:
+        return
     print('## Test Report')
     print('### Global Parameters')
     print('* Engine = ', engine)
