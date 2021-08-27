@@ -255,6 +255,8 @@ def eval(yaml_files, n, engine, temperature, terminal):
                 console.print(f"## Option {ridx+1}")
                 console.print(Syntax(r, context.prompt.language,
                         theme='monokai', line_numbers=True))
+            console.print(report['name'])
+            console.print(report['result'])
             continue
         if report is None:
             exit(1)
