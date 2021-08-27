@@ -29,10 +29,11 @@ def eval_single(path, **kwargs):
         test_code = f.read()
     runs = []
     exceptions = []
+    dir_string = f"_FILE_DIR_='{dir}'\n"
     for i, r in enumerate(context.responses):
         g = {}
         try:
-            exec(r + '\n' + test_code, g)
+            exec(dir_string + r + '\n' + test_code, g)
             if 'result' not in g:
                 exceptions.append(
                     f'\n### Exception on response {i}\n You must have variable `result` defined. \n')
