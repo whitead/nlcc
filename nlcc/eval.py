@@ -21,7 +21,9 @@ def eval_single(path, **kwargs):
         query = f.read()
     # TODO Better way?
     # Make it so we can only get one function
-    if 'def' not in context.prompt.stop:
+    if context.prompt.stop is None:
+        context.prompt.stop = ['def']
+    elif 'def' not in context.prompt.stop:
         context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
