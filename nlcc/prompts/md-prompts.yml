@@ -4,7 +4,3 @@ mdtraj:
     comment: '#'
     multiline_comment: '"""'
     language: python
-    stop:
-        - def
-        - '"""'
-        - '#'

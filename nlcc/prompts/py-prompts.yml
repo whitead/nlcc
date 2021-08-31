@@ -5,9 +5,7 @@ numpy:
     comment: '#'
     multiline_comment: '"""'
     language: python
-    stop:
-        - '"""'
-        - '#'
+
 python:
     text: |
         import math
@@ -16,6 +14,22 @@ python:
     comment: '#'
     multiline_comment: '"""'
     language: python
-    stop:
-        - '"""'
-        - '#'
+
+rdkit:
+    text: |
+        import matplotlib.pyplot as plt
+        from rdkit import Chem
+        from rdkit.Chem import Draw
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+
+pyscf:
+    text: |
+        import pyscf
+        import numpy as np
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python

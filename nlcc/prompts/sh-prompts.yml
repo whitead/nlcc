@@ -10,7 +10,7 @@ gromacs:
 bash:
   text: |
       #!/bin/bash
-      echo "Starting script"
+      ls -l
   comment: '#'
   stop:
     - "\n"
