@@ -46,7 +46,7 @@ def eval_single(path, **kwargs):
             runs.append(False)
     result = {'name': config['name'], 'context': context, 'result': runs}
 
-    return result, '\n\n'.join(exceptions) + obj2html(context)
+    return result, '\n\n'.join(exceptions) #+ obj2html(context) Too long
 
 
 def obj2html(o):
