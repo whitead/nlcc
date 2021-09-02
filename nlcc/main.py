@@ -251,6 +251,8 @@ def eval(yaml_files, n, engine, temperature, terminal):
         report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
         if terminal is True:
             context = report["context"] 
+            console.print(Syntax(info, context.prompt.language,
+                        theme='monokai', line_numbers=False))
             for ridx, r in enumerate(context.responses):
                 console.print(f"## Option {ridx+1}")
                 console.print(Syntax(r, context.prompt.language,
