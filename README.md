@@ -5,8 +5,11 @@
 ## Install
 
 ```sh
-pip install -e .
+pip install maxent@git+git://github.com/whitead/nlcc.git
 ```
+
+Must have Open-AI Codex key: `export OPENAI_API_KEY=<your key here>`
+then `nlcc`
 
 ## key bindings
 
