@@ -2,34 +2,66 @@ numpy:
     text: |
         import numpy as np
         import matplotlib.pyplot as plt
+
+        """
+        Create matrix of ones
+        """
+        a = np.ones((5,10))
+        # end
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"
 
 python:
     text: |
         import math
         import sys
 
+        """
+        compute sin(pi/2)
+        """
+        x = math.sin(math.pi / 2)
+        # end
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"
 
 rdkit:
     text: |
+        import rdkit
         import matplotlib.pyplot as plt
         from rdkit import Chem
         from rdkit.Chem import Draw
 
+        """
+        print rdkit version
+        """
+        print(rdkit.__version__)
+        # end
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"
 
 pyscf:
     text: |
         import pyscf
         import numpy as np
 
+        """
+        Print pyscf version string
+        """
+        print(pyscf.__version__)
+        # end
+
+
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"

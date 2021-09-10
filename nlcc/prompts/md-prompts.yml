@@ -1,12 +1,29 @@
 mdtraj:
     text: |
         import mdtraj as md
+
+        """
+        Print version string
+        """
+        print(md.version.full_version)
+        # end
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"
 MDAnalysis:
     text: |
         import MDAnalysis
+
+        """
+        Print version string
+        """
+        print(MDAnalysis.__version__)
+        # end
+
     comment: '#'
     multiline_comment: '"""'
     language: python
+    stop:
+        - "# end"

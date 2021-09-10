@@ -15,3 +15,14 @@ bash:
   stop:
     - "\n"
   language: bash
+
+slurm:
+  text: |
+    #!/bin/bash
+
+    # set job name to nlcc
+    #SBATCH --job-name contacts
+  stop:
+    - "\n"
+  comment: '#'
+  language: bash
