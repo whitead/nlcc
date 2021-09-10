@@ -20,3 +20,4 @@ pip install -e .
 * `ctrl-x` write to file (same output as copy to clipboard)
 * `ctrl-l` load from file
 * `ctrl-n` update number of code responses
+* `ctrl-down` Enter multiline. `escape-enter` to enter prompt or `ctrl-down` to leave

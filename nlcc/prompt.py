@@ -14,6 +14,7 @@ class Modes(Enum):
     READ_FILE = 4
     SELECT_CONTEXT = 5
     SELECT_RESPONSE = 6
+    MULTILINE = 7
 
 class PromptManager:
     def __init__(self):
@@ -38,11 +39,27 @@ def text_iter(pm, extra_kbs):
 
     @kb.add('enter')
     def _(event):
-        event.current_buffer.validate_and_handle()
+        if pm.peek_mode() != Modes.MULTILINE:
+            event.current_buffer.validate_and_handle()
+        else:
+            event.current_buffer.insert_text('\n')
 
+
+    @kb.add('c-down')
+    def _(event):
+        if pm.peek_mode() != Modes.MULTILINE:
+            pm.push('multiline📜', Modes.MULTILINE)
+        else:
+            pm.pop()
     @kb.add('escape', 'enter')
     def _(event):
-        event.current_buffer.insert_text('\n')
+        if pm.peek_mode() == Modes.MULTILINE:
+            pm.pop()
+            event.current_buffer.validate_and_handle()
+
+
+
+
     history = InMemoryHistory()
     session = PromptSession(
         history=history,

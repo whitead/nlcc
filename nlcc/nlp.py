@@ -68,7 +68,7 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
     return context
 
 
-def guess_context(query, engine, T=0.3):
+def guess_context(query, engine, T=0.4):
     r, _ = engine(query, T=T)
     r = r.split()[0]
     e, r = r.split(',')
