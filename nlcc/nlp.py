@@ -14,6 +14,7 @@ class Prompt:
     multiline_comment: str = None
     stop: list = None
     language: str = None
+    emoji: str = '💻'
 
 
 @dataclass
@@ -69,11 +70,23 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
 
 
 def guess_context(query, engine, T=0.4):
-    r, _ = engine(query, T=T)
-    r = r.split()[0]
-    e, r = r.split(',')
-    if r in prompts:
-        context = Context(e + ' ' + r, prompts[r], prompts[r].text)
+    # check for exact match
+    matched = None
+    for p in prompts:
+        if query.lower() == p.lower():
+            matched = p
+            e = prompts[p].emoji
+    # try engine match
+    if not matched:
+        r, _ = engine(query, T=T)
+        r = r.split()[0]
+        e, r = r.split(',')
+        if r in prompts:
+            matched = r
+    print(f'"{matched}" "{e}"')
+    if matched:
+        context = Context(e + ' ' + matched,
+                          prompts[matched], prompts[matched].text)
     else:
         context = Context(e, Prompt())
     return context

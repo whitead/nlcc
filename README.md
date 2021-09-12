@@ -1,5 +1,5 @@
 # nlcc
-[![PyPI version](https://badge.fury.io/py/nlcc.svg)](https://badge.fury.io/py/nlcc)
+[![PyPI version](https://badge.fury.io/py/nlcc.svg)](https://badge.fury.io/py/nlcc)[![tests](https://github.com/whitead/nlcc/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/nlcc)
 
 ![Demo](./docs/demo.svg)
 
