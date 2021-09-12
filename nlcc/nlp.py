@@ -83,7 +83,6 @@ def guess_context(query, engine, T=0.4):
         e, r = r.split(',')
         if r in prompts:
             matched = r
-    print(f'"{matched}" "{e}"')
     if matched:
         context = Context(e + ' ' + matched,
                           prompts[matched], prompts[matched].text)
