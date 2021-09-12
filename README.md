@@ -1,4 +1,5 @@
 # nlcc
+[![PyPI version](https://badge.fury.io/py/nlcc.svg)](https://badge.fury.io/py/nlcc)
 
 ![Demo](./docs/demo.svg)
 
