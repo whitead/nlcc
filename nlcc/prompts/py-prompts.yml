@@ -66,3 +66,18 @@ pyscf:
     language: python
     stop:
         - "# end"
+
+sympy:
+    text: |
+        import sympy
+
+        """
+        print sympy version
+        """
+        print(sympy.__version__)
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
