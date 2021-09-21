@@ -12,6 +12,19 @@ pip install nlcc
 Must have Open-AI Codex key: `export OPENAI_API_KEY=<your key here>`
 then `nlcc`
 
+## citation
+
+Please cite [our preprint](https://arxiv.org/abs/2108.13360)
+
+```bibtex
+@article{hocky2021natural,
+  title={Natural Language Processing Models That Automate Programming Will Transform Chemistry Research and Teaching},
+  author={Hocky, Glen M and White, Andrew D},
+  journal={arXiv preprint arXiv:2108.13360},
+  year={2021}
+}
+```
+
 ## key bindings
 
 * `ctrl-w` copy to clipboard (Note, you may need to install xsel on linux)
