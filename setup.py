@@ -28,6 +28,7 @@ setup(name='nlcc',
         [console_scripts]
         nlcc=nlcc.main:main
         nlcc-eval=nlcc.main:eval
+        nlcc-bench=nlcc.main:benchmark
         nlcc-prompts=nlcc.main:prompts
             ''',
       package_data={'nlcc': ['prompts/*yml']},

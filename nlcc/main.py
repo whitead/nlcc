@@ -238,7 +238,7 @@ def main(input_file, engine, help, n_responses):
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
-@click.option('--terminal',default=False,is_flag=True)
+@click.option('--terminal', default=False, is_flag=True)
 @click.option('--temperature', default=0.2)
 def eval(yaml_files, n, engine, temperature, terminal):
     if terminal is True:
@@ -250,13 +250,13 @@ def eval(yaml_files, n, engine, temperature, terminal):
     for y in yaml_files:
         report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
         if terminal is True:
-            context = report["context"] 
+            context = report["context"]
             console.print(Syntax(info, context.prompt.language,
-                        theme='monokai', line_numbers=False))
+                                 theme='monokai', line_numbers=False))
             for ridx, r in enumerate(context.responses):
                 console.print(f"## Option {ridx+1}")
                 console.print(Syntax(r, context.prompt.language,
-                        theme='monokai', line_numbers=True))
+                                     theme='monokai', line_numbers=True))
             console.print(report['name'])
             console.print(report['result'])
             continue
@@ -281,6 +281,28 @@ def eval(yaml_files, n, engine, temperature, terminal):
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
     print('## Test Details')
     print('\n'.join(collapsables))
+
+
+@click.command()
+@click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
+@click.argument('output', type=click.Path(exists=False))
+@click.option('--n', default=1, help='number of respones')
+@click.option('--engine', default='openai')
+@click.option('--temperature', default=0.2)
+def benchmark(yaml_files, output, n, engine, temperature):
+    from tabulate import tabulate
+    nlp_engine, code_engine = get_engine(engine)
+    table = []
+    collapsables = []
+    for y in yaml_files:
+        print(y)
+        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        table.append([report['name']] +
+                     ['Pass' if r else 'Fail' for r in report['result']])
+    with open(output, 'w') as f:
+        f.write(tabulate(table, ['Test'] +
+                         [f'Run_{i}' for i in range(n)], tablefmt="tsv"))
+        f.write('\n')
 
 
 @click.command()
