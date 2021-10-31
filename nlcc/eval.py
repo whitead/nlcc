@@ -42,11 +42,11 @@ def eval_single(path, **kwargs):
             runs.append(g['result'])
         except Exception as e:
             exceptions.append(
-                f'\n### Exception on response {i}\n\n ```python \n{str(e)}\n```\n')
+                f'\n### Exception on response {i}\n\n ```py \n{str(e)}\n```\n')
             runs.append(False)
     result = {'name': config['name'], 'context': context, 'result': runs}
 
-    return result, '\n\n'.join(exceptions) #+ obj2html(context) Too long
+    return result, '\n\n'.join(exceptions)  # + obj2html(context) Too long
 
 
 def obj2html(o):
