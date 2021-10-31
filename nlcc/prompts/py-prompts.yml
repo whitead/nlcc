@@ -33,10 +33,13 @@ python:
 
 rdkit:
     text: |
-        import rdkit
         import matplotlib.pyplot as plt
+        import rdkit
         from rdkit import Chem
         from rdkit.Chem import Draw
+        import rdkit.Chem.rdMolDescriptors
+        import rdkit.Chem.Crippen
+        import rdkit.Chem.Descriptors
 
         """
         print rdkit version
