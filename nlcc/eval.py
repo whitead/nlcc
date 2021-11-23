@@ -27,6 +27,10 @@ def eval_single(path, **kwargs):
         context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
+    if not 'test' in config or config['test'] is None:
+        result = {'name': config['name'], 'context': context, 'result': None}
+        return result, ""
+
     with open(os.path.join(dir, config['test']), 'r') as f:
         test_code = f.read()
     runs = []
