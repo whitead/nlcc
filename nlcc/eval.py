@@ -27,7 +27,12 @@ def eval_single(path, **kwargs):
         context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
-    if not 'test' in config or config['test'] is None:
+    # check if disabled
+    disabled = False
+    if 'categories' in config and 'disabled' in config['categories']:
+        disabled = True
+
+    if disabled or not 'test' in config or config['test'] is None:
         result = {'name': config['name'], 'context': context, 'result': None}
         return result, ""
 
