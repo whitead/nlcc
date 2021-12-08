@@ -235,30 +235,39 @@ def main(input_file, engine, help, n_responses):
 
 @click.command()
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
+@click.option('--out_dir',type=click.Path(exists=True))
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
 @click.option('--temperature', default=0.2)
-def human_check(yaml_files, n, engine, temperature):
+def human_check(yaml_files, n, engine, temperature, out_dir=None):
     from datetime import date
+    import yaml
     nlp_engine, code_engine = get_engine(engine)
     dict_list = []
     date_label = date.today().strftime("%d%b%Y")
 
+
     for y in yaml_files:
+        if out_dir is None:
+            out_dir = os.path.dirname(y)
+
         report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
         context = report["context"]
         for ridx, r in enumerate(context.responses):
             result_dict = {}
-            result_dict['label'] = f"{report['name']}_d{date_label}_T{context.T}_r{ridx}"
-            result_dict['context'] = context
+            label = f"result_{report['name']}_d{date_label}_T{context.T}_r{ridx}"
+            result_dict['label'] = label
+            #result_dict['context'] = context
             result_dict['response_id'] = ridx
             result_dict['code_response'] = r
             result_dict['prompt'] = context.text
+            result_dict['query'] = context.query
+            result_dict['query_type'] = context.query_type
             result_dict['computer_result'] = report['result']
             if result_dict['computer_result'] is not None:
                 result_dict['computer_result'] = result_dict['computer_result'][ridx]
-            print(report)
-            print(result_dict['label'])
+            out_file = os.path.join(out_dir,label)
+            yaml.dump(result_dict,open(out_file,'w'))
 
 @click.command()
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)

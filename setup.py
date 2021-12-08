@@ -30,6 +30,7 @@ setup(name='nlcc',
         nlcc-eval=nlcc.main:eval
         nlcc-bench=nlcc.main:benchmark
         nlcc-prompts=nlcc.main:prompts
+        nlcc-human=nlcc.main:human_check
             ''',
       package_data={'nlcc': ['prompts/*yml']},
       long_description=long_description,
