@@ -288,6 +288,8 @@ def eval(yaml_files, n, engine, temperature, terminal):
             continue
         if report is None:
             exit(1)
+        if report['result'] is None:
+            continue
         collapsables.append(f'''
 <details>
     <summary>{report['name']}</summary>
