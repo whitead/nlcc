@@ -64,6 +64,7 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
     elif query_type == 'code':
         query = context.text + '\n' + \
             query if len(context.text) > 0 else query
+    context.query = query
     context.query_type = query_type
     r = engine(query, T=T, stop=context.prompt.stop, n=n)
     context.responses = tuple([query + ri for ri in r])
