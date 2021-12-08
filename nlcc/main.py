@@ -233,6 +233,32 @@ def main(input_file, engine, help, n_responses):
             pm.push(context.name if len(context.name) >
                     1 else 'context-free', Modes.QUERY)
 
+@click.command()
+@click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
+@click.option('--n', default=1, help='number of respones')
+@click.option('--engine', default='openai')
+@click.option('--temperature', default=0.2)
+def human_check(yaml_files, n, engine, temperature):
+    from datetime import date
+    nlp_engine, code_engine = get_engine(engine)
+    dict_list = []
+    date_label = date.today().strftime("%d%b%Y")
+
+    for y in yaml_files:
+        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        context = report["context"]
+        for ridx, r in enumerate(context.responses):
+            result_dict = {}
+            result_dict['label'] = f"{report['name']}_d{date_label}_T{context.T}_r{ridx}"
+            result_dict['context'] = context
+            result_dict['response_id'] = ridx
+            result_dict['code_response'] = r
+            result_dict['prompt'] = context.text
+            result_dict['computer_result'] = report['result']
+            if result_dict['computer_result'] is not None:
+                result_dict['computer_result'] = result_dict['computer_result'][ridx]
+            print(report)
+            print(result_dict['label'])
 
 @click.command()
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
@@ -281,6 +307,7 @@ def eval(yaml_files, n, engine, temperature, terminal):
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
     print('## Test Details')
     print('\n'.join(collapsables))
+
 
 
 @click.command()
