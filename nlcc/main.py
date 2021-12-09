@@ -266,7 +266,7 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
             result_dict['computer_result'] = report['result']
             if result_dict['computer_result'] is not None:
                 result_dict['computer_result'] = result_dict['computer_result'][ridx]
-            out_file = os.path.join(out_dir,label)
+            out_file = os.path.join(out_dir,label)+'.yml'
             yaml.dump(result_dict,open(out_file,'w'))
 
 @click.command()
