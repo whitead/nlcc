@@ -55,7 +55,6 @@ rdkit:
 pyscf:
     text: |
         import pyscf
-        import numpy as np
 
         """
         Print pyscf version string
