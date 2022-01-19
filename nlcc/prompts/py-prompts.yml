@@ -51,6 +51,26 @@ rdkit:
     language: python
     stop:
         - "# end"
+biopython:
+    text: |
+        from Bio import SeqIO
+        from Bio import Align
+        from Bio import PopGen
+        from Bio.PDB import *
+        from Bio.Seq import Seq
+        import Bio
+        from Bio import pairwise2
+        from Bio.SubsMat import MatrixInfo as matlist
+        """
+        print biopython version
+        """
+        print(Bio.__version__)
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
 
 pyscf:
     text: |

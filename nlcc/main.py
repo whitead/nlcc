@@ -103,9 +103,9 @@ def main(input_file, engine, help, n_responses):
             if len(response_text) > 1:
                 console.print(f"## Option {idx+1}")
             console.print(Syntax(query, context.prompt.language,
-                                 theme='monokai', line_numbers=True))
+                                 theme='monokai', line_numbers=False))
             console.print(Syntax(response, context.prompt.language,
-                                 theme='monokai', line_numbers=True))
+                                 theme='monokai', line_numbers=False))
         return context
 
     if input_file is not None:
@@ -204,7 +204,7 @@ def main(input_file, engine, help, n_responses):
                 i = int(query) - 1
                 context.text = context.responses[i]
                 console.print(Syntax(context.text, context.prompt.language,
-                                     theme='monokai', line_numbers=True))
+                                     theme='monokai', line_numbers=False))
                 context.responses = None
             except Exception as e:
                 console.print(e)
@@ -216,13 +216,13 @@ def main(input_file, engine, help, n_responses):
             if len(context.responses) == 1:
                 context.text = context.responses[0]
                 console.print(Syntax(context.text, context.prompt.language,
-                                     theme='monokai', line_numbers=True))
+                                     theme='monokai', line_numbers=False))
                 context.responses = None
             else:
                 for ridx, r in enumerate(context.responses):
                     console.print(f"## Option {ridx+1}")
                     console.print(Syntax(r, context.prompt.language,
-                                         theme='monokai', line_numbers=True))
+                                         theme='monokai', line_numbers=False))
                 pm.push('🤔which response', Modes.SELECT_RESPONSE)
                 # do not want pop
                 continue
@@ -291,7 +291,7 @@ def eval(yaml_files, n, engine, temperature, terminal):
             for ridx, r in enumerate(context.responses):
                 console.print(f"## Option {ridx+1}")
                 console.print(Syntax(r, context.prompt.language,
-                                     theme='monokai', line_numbers=True))
+                                     theme='monokai', line_numbers=False))
             console.print(report['name'])
             console.print(report['result'])
             continue

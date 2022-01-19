@@ -4,18 +4,19 @@ import os
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
-def code_engine(query, T=0.00, stop=None, n=1):
+def code_engine(query, T=0.00, stop=None, n=1, max_tokens=512):
     response = openai.Completion.create(
         engine="davinci-codex",
         prompt=query,
         temperature=T,
-        max_tokens=256,
+        max_tokens=max_tokens,
         top_p=1,
         frequency_penalty=0.0,
         presence_penalty=0,
         stop=stop,
         n=n,
     )
+
     return [r['text'] for r in response['choices']]
 
 
