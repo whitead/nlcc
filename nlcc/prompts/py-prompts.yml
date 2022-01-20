@@ -60,7 +60,9 @@ biopython:
         from Bio.Seq import Seq
         import Bio
         from Bio import pairwise2
+        from Bio.Blast import NCBIWWW, NCBIXML
         from Bio.SubsMat import MatrixInfo as matlist
+
         """
         print biopython version
         """
@@ -71,7 +73,21 @@ biopython:
     language: python
     stop:
         - "# end"
+requests:
+    text: |
+        import requests
+        from bs4 import BeautifulSoup
 
+        """
+        print requests version
+        """
+        print(requests.__version__)
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
 pyscf:
     text: |
         import pyscf
