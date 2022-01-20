@@ -53,11 +53,46 @@ rdkit:
     language: python
     stop:
         - "# end"
+biopython:
+    text: |
+        from Bio import SeqIO
+        from Bio import Align
+        from Bio import PopGen
+        from Bio.PDB import *
+        from Bio.Seq import Seq
+        import Bio
+        from Bio import pairwise2
+        from Bio.Blast import NCBIWWW, NCBIXML
+        from Bio.SubsMat import MatrixInfo as matlist
 
+        """
+        print biopython version
+        """
+        print(Bio.__version__)
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
+requests:
+    text: |
+        import requests
+        from bs4 import BeautifulSoup
+
+        """
+        print requests version
+        """
+        print(requests.__version__)
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
 pyscf:
     text: |
         import pyscf
-        import numpy as np
 
         """
         Print pyscf version string
