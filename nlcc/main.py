@@ -1,4 +1,4 @@
-from .eval import eval_single, obj2html
+from .eval import eval_single
 from nlcc.openai import code_engine, nlp_engine
 import os
 from rich.markdown import Markdown
@@ -12,6 +12,7 @@ from . import nlp
 import click
 from importlib_metadata import metadata
 from .prompt import text_iter, Modes, PromptManager
+from textwrap import dedent
 
 pretty.install()
 
@@ -247,12 +248,17 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
     dict_list = []
     date_label = date.today().strftime("%d%b%Y")
 
+    print('## Human Evaluations\n\n Follow links to add evaluation to evaluate\n\n')
     for y in yaml_files:
         if out_dir is None:
             out_dir = os.path.dirname(y)
 
-        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        report, info = eval_single(
+            y, engine=code_engine, n=n, T=temperature, category='human')
+        if report is None:
+            continue
         context = report["context"]
+        print(f'### {report["name"]}\n\n')
         for ridx, r in enumerate(context.responses):
             result_dict = {}
             label = f"result_{report['name']}_d{date_label}_T{context.T}_r{ridx}"
@@ -261,7 +267,7 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
             result_dict['response_id'] = ridx
             result_dict['code_response'] = r
             result_dict['prompt'] = context.text
-            result_dict['name'] = report['name']
+            result_dict['name'] = report['name'] +' ' + ridx
             result_dict['query'] = context.query
             result_dict['query_type'] = context.query_type
             result_dict['computer_result'] = report['result']
@@ -269,6 +275,8 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
                 result_dict['computer_result'] = result_dict['computer_result'][ridx]
             out_file = os.path.join(out_dir, label)+'.yml'
             yaml.dump(result_dict, open(out_file, 'w'))
+            print(f'* [Reponse {ridx}](human/{label}.html)')
+        print('\n')
 
 
 @click.command()
@@ -286,7 +294,9 @@ def eval(yaml_files, n, engine, temperature, terminal):
     collapsables = []
     for y in yaml_files:
         report, info = eval_single(
-            y, engine=code_engine, n=n, T=temperature, category='human')
+            y, engine=code_engine, n=n, T=temperature, category='code')
+        if report is None:
+            continue
         if terminal is True:
             context = report["context"]
             console.print(Syntax(info, context.prompt.language,
@@ -302,12 +312,8 @@ def eval(yaml_files, n, engine, temperature, terminal):
             exit(1)
         if report['result'] is None:
             continue
-        collapsables.append(f'''
-<details>
-    <summary>{report['name']}</summary>
-    {info}
-</details>
-        ''')
+        collapsables.append(
+            f'<details>\n<summary>{report["name"]}</summary>\n{info}</details>')
         table.append([report['name']] +
                      ['Pass' if r else 'Fail' for r in report['result']])
     if terminal is True:
@@ -315,11 +321,11 @@ def eval(yaml_files, n, engine, temperature, terminal):
     print('## Test Report')
     print('### Global Parameters')
     print('* Engine = ', engine)
-    print('* n = ', n)
-    print('## Results')
+    print('* n = ', n, '\n')
+    print('### Code Results\n')
     print(tabulate(table, ['Test'] +
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
-    print('## Test Details')
+    print('### Details\n')
     print('\n'.join(collapsables))
 
 
@@ -343,17 +349,3 @@ def benchmark(yaml_files, output, n, engine, temperature):
         f.write(tabulate(table, ['Test'] +
                          [f'Run_{i}' for i in range(n)], tablefmt="tsv"))
         f.write('\n')
-
-
-@click.command()
-def prompts():
-    collapsables = []
-    for n, p in nlp.prompts.items():
-        collapsables.append(f'''
-<details>
-    <summary>{n}</summary>
-    {obj2html(p)}
-</details>
-        ''')
-    pyperclip.copy('\n'.join(collapsables))
-    print('I put them on your clipboard. Hopefully you wanted that!!')

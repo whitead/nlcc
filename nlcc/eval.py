@@ -3,6 +3,8 @@ from . import nlp
 import os
 from rich import inspect, reconfigure, get_console
 from rich.console import Console
+from contextlib import redirect_stdout
+from textwrap import dedent
 
 
 def eval_single(path, category=None, **kwargs):
@@ -16,6 +18,17 @@ def eval_single(path, category=None, **kwargs):
         print(e)
         inspect(config, docs=False, methods=False)
         return None, None
+
+    # check if disabled
+    disabled = False
+    if 'categories' in config:
+        if 'disabled' in config['categories']:
+            disabled = True
+        if category is not None and category not in config['categories']:
+            disabled = True
+    if disabled:
+        return None, None
+
     dir = os.path.dirname(path)
     with open(os.path.join(dir, config['prompt']), 'r') as f:
         query = f.read()
@@ -27,45 +40,36 @@ def eval_single(path, category=None, **kwargs):
         context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
 
-    # check if disabled
-    disabled = False
-    if 'categories' in config:
-        if 'disabled' in config['categories']:
-            disabled = True
-        if category is not None and category not in config['categories']:
-            disabled = True
-    if disabled or not 'test' in config or config['test'] is None:
+    if not 'test' in config or config['test'] is None:
         result = {'name': config['name'], 'context': context, 'result': None}
-        return result, ""
+        return result, ''
 
     with open(os.path.join(dir, config['test']), 'r') as f:
         test_code = f.read()
     runs = []
     exceptions = []
     dir_string = f"_FILE_DIR_='{dir}'\n"
+    markdown = f'#### Query\n\n```py\n{context.query}\n\n```'
     for i, r in enumerate(context.responses):
         g = {}
+        success = True
         try:
-            exec(dir_string + r + '\n' + test_code, g)
+            with redirect_stdout(None):
+                exec(dir_string + r + '\n' + test_code, g)
             if 'result' not in g:
                 exceptions.append(
-                    f'\n### Exception on response {i}\n You must have variable `result` defined. \n')
+                    f'\nYou must have variable `result` defined. \n')
+                success = False
             runs.append(g['result'])
         except Exception as e:
             exceptions.append(
-                f'\n### Exception on response {i}\n\n ```py \n{str(e)}\n```\n')
+                f'{str(e)}')
             runs.append(False)
+            success = False
+        markdown += f'\n#### Run {i}\n\n'
+        markdown += f'```py\n{r}\n```\n'
+        markdown += f'Output:\n```\n{"Success" if success else exceptions[-1]}\n```\n\n'
     result = {'name': config['name'], 'context': context, 'result': runs}
 
-    return result, '\n\n'.join(exceptions)  # + obj2html(context) Too long
-
-
-def obj2html(o):
-    # make new console with info
-    reconfigure(record=True, file=open(os.devnull, 'w'))
-    console = get_console()
-    # with console.capture() as capture:
-    console.print(inspect(o))
-    info_html = console.export_html(inline_styles=True,
-                                    code_format="<pre style=\"font-family: Menlo, 'DejaVu Sans Mono', consolas, 'Courier New', monospace\">{code}</pre>")
-    return info_html
+    # can be too long
+    return result, markdown
