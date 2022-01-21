@@ -49,7 +49,7 @@ def eval_single(path, category=None, **kwargs):
     runs = []
     exceptions = []
     dir_string = f"_FILE_DIR_='{dir}'\n"
-    markdown = f'#### Query\n\n```py\n{context.query}\n\n```'
+    markdown = f'\n#### Query\n\n```py\n{context.query}\n\n```'
     for i, r in enumerate(context.responses):
         g = {}
         success = True
