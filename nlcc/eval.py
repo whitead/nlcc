@@ -5,7 +5,7 @@ from rich import inspect, reconfigure, get_console
 from rich.console import Console
 
 
-def eval_single(path, **kwargs):
+def eval_single(path, category=None, **kwargs):
     with open(path, 'r') as f:
         config = yaml.safe_load(f.read())
     try:
@@ -29,9 +29,11 @@ def eval_single(path, **kwargs):
 
     # check if disabled
     disabled = False
-    if 'categories' in config and 'disabled' in config['categories']:
-        disabled = True
-
+    if 'categories' in config:
+        if 'disabled' in config['categories']:
+            disabled = True
+        if category is not None and category not in config['categories']:
+            disabled = True
     if disabled or not 'test' in config or config['test'] is None:
         result = {'name': config['name'], 'context': context, 'result': None}
         return result, ""

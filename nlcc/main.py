@@ -233,9 +233,10 @@ def main(input_file, engine, help, n_responses):
             pm.push(context.name if len(context.name) >
                     1 else 'context-free', Modes.QUERY)
 
+
 @click.command()
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
-@click.option('--out_dir',type=click.Path(exists=True))
+@click.option('--out-dir', type=click.Path(exists=True))
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
 @click.option('--temperature', default=0.2)
@@ -245,7 +246,6 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
     nlp_engine, code_engine = get_engine(engine)
     dict_list = []
     date_label = date.today().strftime("%d%b%Y")
-
 
     for y in yaml_files:
         if out_dir is None:
@@ -261,13 +261,15 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
             result_dict['response_id'] = ridx
             result_dict['code_response'] = r
             result_dict['prompt'] = context.text
+            result_dict['name'] = report['name']
             result_dict['query'] = context.query
             result_dict['query_type'] = context.query_type
             result_dict['computer_result'] = report['result']
             if result_dict['computer_result'] is not None:
                 result_dict['computer_result'] = result_dict['computer_result'][ridx]
-            out_file = os.path.join(out_dir,label)+'.yml'
-            yaml.dump(result_dict,open(out_file,'w'))
+            out_file = os.path.join(out_dir, label)+'.yml'
+            yaml.dump(result_dict, open(out_file, 'w'))
+
 
 @click.command()
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
@@ -283,7 +285,8 @@ def eval(yaml_files, n, engine, temperature, terminal):
     table = []
     collapsables = []
     for y in yaml_files:
-        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        report, info = eval_single(
+            y, engine=code_engine, n=n, T=temperature, category='human')
         if terminal is True:
             context = report["context"]
             console.print(Syntax(info, context.prompt.language,
@@ -318,7 +321,6 @@ def eval(yaml_files, n, engine, temperature, terminal):
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
     print('## Test Details')
     print('\n'.join(collapsables))
-
 
 
 @click.command()
