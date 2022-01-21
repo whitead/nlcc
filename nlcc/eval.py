@@ -67,7 +67,8 @@ def eval_single(path, category=None, **kwargs):
             runs.append(False)
             success = False
         markdown += f'\n#### Run {i}\n\n'
-        markdown += f'```py\n{r + "\n" + test_code}\n```\n'
+        code_str = r + '\n' + test_code
+        markdown += f'```py\n{code_str}\n```\n'
         markdown += f'Output:\n```\n{"Success" if success else exceptions[-1]}\n```\n\n'
     result = {'name': config['name'], 'context': context, 'result': runs}
 
