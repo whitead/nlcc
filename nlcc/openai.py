@@ -1,9 +1,13 @@
 import openai
 import os
+from ratelimit import limits, sleep_and_retry
+
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
+@sleep_and_retry
+@limits(calls=20, period=60)
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=512):
     response = openai.Completion.create(
         engine="davinci-codex",
