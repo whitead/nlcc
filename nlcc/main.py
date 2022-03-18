@@ -335,17 +335,22 @@ def eval(yaml_files, n, engine, temperature, terminal):
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
 @click.option('--temperature', default=0.2)
-def benchmark(yaml_files, output, n, engine, temperature):
+@click.option('--prompt', default=None)
+def benchmark(yaml_files, output, n, engine, temperature, prompt):
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
     table = []
     collapsables = []
     for y in yaml_files:
         print(y)
-        report, info = eval_single(y, engine=code_engine, n=n, T=temperature)
+        report, info = eval_single(
+            y, engine=code_engine, n=n, T=temperature, override_prompt=prompt)
+        if report['result'] is None:
+            # disabled
+            continue
         table.append([report['name']] +
                      ['Pass' if r else 'Fail' for r in report['result']])
     with open(output, 'w') as f:
-        f.write(tabulate(table, ['Test'] +
-                         [f'Run_{i}' for i in range(n)], tablefmt="tsv"))
+        f.write(tabulate(table, ['name'] +
+                         [f'Run_{i}' for i in range(n)], tablefmt="plain"))
         f.write('\n')

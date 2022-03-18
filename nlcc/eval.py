@@ -7,12 +7,14 @@ from contextlib import redirect_stdout
 from textwrap import dedent
 
 
-def eval_single(path, category=None, **kwargs):
+def eval_single(path, category=None, override_prompt=None, **kwargs):
     with open(path, 'r') as f:
         config = yaml.safe_load(f.read())
     try:
+        prompt = nlp.prompts[config['context']
+                             ] if override_prompt is None else nlp.prompts[override_prompt]
         context = nlp.Context(
-            name=config['name'], prompt=nlp.prompts[config['context']])
+            name=config['name'], prompt=prompt)
     except Exception as e:
         print(f'ERROR: Could not parse file {f.name}')
         print(e)
