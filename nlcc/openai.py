@@ -7,7 +7,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 @sleep_and_retry
-@limits(calls=19, period=60)
+@limits(calls=5, period=60)
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
     response = openai.Completion.create(
         engine="davinci-codex",
