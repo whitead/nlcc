@@ -348,9 +348,9 @@ def benchmark(yaml_files, output, n, engine, temperature, prompt):
         if report['result'] is None:
             # disabled
             continue
-        table.append([report['name']] +
-                     ['Pass' if r else 'Fail' for r in report['result']])
+        for r in report['result']:
+            table.append([report['name']] +
+                     [1 if r else 0])
     with open(output, 'w') as f:
-        f.write(tabulate(table, ['name'] +
-                         [f'Run_{i}' for i in range(n)], tablefmt="plain"))
+        f.write(tabulate(table, ['name', 'result'], tablefmt="plain"))
         f.write('\n')
