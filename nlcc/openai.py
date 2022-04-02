@@ -2,7 +2,7 @@ import openai
 import os
 from pyrate_limiter import Duration, Limiter, RequestRate
 
-limiter = Limiter(RequestRate(24, Duration.MINUTE))
+limiter = Limiter(RequestRate(19, Duration.MINUTE))
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
