@@ -343,14 +343,15 @@ def benchmark(yaml_files, output, n, engine, temperature, prompt):
     collapsables = []
     for y in yaml_files:
         print(y)
-        report, info = eval_single(
+        report, _ = eval_single(
             y, engine=code_engine, n=n, T=temperature, override_prompt=prompt)
         if report['result'] is None:
             # disabled
             continue
         for r in report['result']:
             table.append([report['name']] +
-                     [1 if r else 0])
+                         [1 if r else 0] + [temperature])
     with open(output, 'w') as f:
-        f.write(tabulate(table, ['name', 'result'], tablefmt="plain"))
+        f.write(tabulate(table, ['name', 'result',
+                                 'temperature'], tablefmt="plain"))
         f.write('\n')

@@ -5,6 +5,7 @@ from rich import inspect, reconfigure, get_console
 from rich.console import Console
 from contextlib import redirect_stdout
 from textwrap import dedent
+import numpy as np
 
 
 def eval_single(path, category=None, override_prompt=None, **kwargs):
@@ -20,6 +21,9 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
         print(e)
         inspect(config, docs=False, methods=False)
         return None, None
+
+    # this is to short-circuit the evaluator
+    # return {'result': np.random.choice([True, False], size=kwargs['n']), 'name': config['name']}, None
 
     # check if disabled
     disabled = False
