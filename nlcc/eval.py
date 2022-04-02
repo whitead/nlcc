@@ -5,7 +5,7 @@ from rich import inspect, reconfigure, get_console
 from rich.console import Console
 from contextlib import redirect_stdout
 from textwrap import dedent
-import numpy as np
+from .timeout import timeout
 
 
 def eval_single(path, category=None, override_prompt=None, **kwargs):
@@ -61,7 +61,8 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
         success = True
         try:
             with redirect_stdout(None):
-                exec(dir_string + r + '\n' + test_code, g)
+                with timeout(seconds=10):
+                    exec(dir_string + r + '\n' + test_code, g)
             if 'result' not in g:
                 exceptions.append(
                     f'\nYou must have variable `result` defined. \n')

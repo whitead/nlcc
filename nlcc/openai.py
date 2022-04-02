@@ -1,26 +1,34 @@
 import openai
 import os
+import time
 from pyrate_limiter import Duration, Limiter, RequestRate
 
-limiter = Limiter(RequestRate(19, Duration.MINUTE))
+limiter = Limiter(RequestRate(23, Duration.MINUTE))
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
-@limiter.ratelimit('codex', delay=True)
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
-    response = openai.Completion.create(
-        engine="davinci-codex",
-        prompt=query,
-        temperature=T,
-        max_tokens=max_tokens,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0,
-        stop=stop,
-        n=n,
-    )
+    while True:
+        try:
+            with limiter.ratelimit('codex', delay=True):
+                response = openai.Completion.create(
+                    engine="davinci-codex",
+                    prompt=query,
+                    temperature=T,
+                    max_tokens=max_tokens,
+                    top_p=1,
+                    frequency_penalty=0.0,
+                    presence_penalty=0,
+                    stop=stop,
+                    n=n,
+                )
+                break
+        except openai.error.RateLimitError:
+            print('Rate limit exceeded (even though we limit!), retrying...')
+            time.sleep(15)
+            continue
 
     return [r['text'] for r in response['choices']]
 
