@@ -6,14 +6,26 @@ from rich.console import Console
 from contextlib import redirect_stdout
 from textwrap import dedent
 from .timeout import timeout
+import dataclasses
 
 
 def eval_single(path, category=None, override_prompt=None, **kwargs):
     with open(path, 'r') as f:
         config = yaml.safe_load(f.read())
     try:
-        prompt = nlp.prompts[config['context']
-                             ] if override_prompt is None else nlp.prompts[override_prompt]
+        if override_prompt is None:
+            prompt = nlp.prompts[config['context']]
+        # special ones
+        elif override_prompt == 'insert':
+            prompt = nlp.prompts[config['context'] + '-insert']
+
+        elif override_prompt.startswith('header:'):
+            prompt = nlp.prompts[config['context'] + '-insert']
+            prompt = dataclasses.replace(prompt)
+            prompt.text = override_prompt.split(
+                'header:')[-1] + prompt.text
+        else:
+            prompt = nlp.prompts[override_prompt]
         context = nlp.Context(
             name=config['name'], prompt=prompt)
     except Exception as e:
@@ -45,7 +57,6 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
     elif 'def' not in context.prompt.stop:
         context.prompt.stop = ['def'] + context.prompt.stop
     context = nlp.code_completion(query, context, **kwargs)
-
     if not 'test' in config or config['test'] is None:
         result = {'name': config['name'], 'context': context, 'result': None}
         return result, ''

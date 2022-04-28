@@ -241,7 +241,8 @@ def main(input_file, engine, help, n_responses):
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
 @click.option('--temperature', default=0.2)
-def human_check(yaml_files, n, engine, temperature, out_dir=None):
+@click.option('--prompt', default=None, type=str)
+def human_check(yaml_files, n, engine, temperature, out_dir, prompt):
     from datetime import date
     import yaml
     nlp_engine, code_engine = get_engine(engine)
@@ -254,7 +255,7 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
             out_dir = os.path.dirname(y)
 
         report, info = eval_single(
-            y, engine=code_engine, n=n, T=temperature, category='human')
+            y, engine=code_engine, n=n, T=temperature, category='human', override_prompt=prompt)
         if report is None:
             continue
         context = report["context"]
@@ -285,7 +286,8 @@ def human_check(yaml_files, n, engine, temperature, out_dir=None):
 @click.option('--engine', default='openai')
 @click.option('--terminal', default=False, is_flag=True)
 @click.option('--temperature', default=0.2)
-def eval(yaml_files, n, engine, temperature, terminal):
+@click.option('--prompt', default=None, type=str)
+def eval(yaml_files, n, engine, temperature, terminal, prompt):
     if terminal is True:
         console = Console()
     from tabulate import tabulate
@@ -294,7 +296,7 @@ def eval(yaml_files, n, engine, temperature, terminal):
     collapsables = []
     for y in yaml_files:
         report, info = eval_single(
-            y, engine=code_engine, n=n, T=temperature, category='code')
+            y, engine=code_engine, n=n, T=temperature, category='code', override_prompt=prompt)
         if report is None:
             continue
         if terminal is True:
@@ -335,7 +337,7 @@ def eval(yaml_files, n, engine, temperature, terminal):
 @click.option('--n', default=1, help='number of respones')
 @click.option('--engine', default='openai')
 @click.option('--temperature', default=0.2)
-@click.option('--prompt', default=None)
+@click.option('--prompt', default=None, type=str)
 def benchmark(yaml_files, output, n, engine, temperature, prompt):
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
