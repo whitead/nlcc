@@ -10,10 +10,9 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
+    suffix = None
     if '[insert]' in query:
         query, suffix = query.split('[insert]')
-    else:
-        suffix is None
     while True:
         try:
             with limiter.ratelimit('codex', delay=True):
