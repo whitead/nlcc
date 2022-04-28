@@ -346,8 +346,7 @@ def benchmark(yaml_files, output, n, engine, temperature, prompt):
         report, _ = eval_single(
             y, engine=code_engine, n=n, T=temperature, override_prompt=prompt)
         if report['result'] is None:
-            # disabled
-            continue
+            report['result'] = [False] * n
         for r in report['result']:
             table.append([report['name']] +
                          [1 if r else 0] + [temperature])

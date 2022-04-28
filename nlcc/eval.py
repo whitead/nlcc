@@ -69,6 +69,7 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
                 success = False
             runs.append(g['result'])
         except Exception as e:
+            print(e)
             exceptions.append(
                 f'{str(e)}')
             runs.append(False)

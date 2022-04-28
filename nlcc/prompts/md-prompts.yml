@@ -27,3 +27,22 @@ MDAnalysis:
     language: python
     stop:
         - "# end"
+
+mdtraj-insert:
+    text: |
+        import mdtraj as md
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+MDAnalysis-insert:
+    text: |
+        import MDAnalysis
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"

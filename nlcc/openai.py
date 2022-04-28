@@ -10,11 +10,15 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
+    if '[insert]' in query:
+        query, suffix = query.split('[insert]')
+    else:
+        suffix is None
     while True:
         try:
             with limiter.ratelimit('codex', delay=True):
                 response = openai.Completion.create(
-                    engine="davinci-codex",
+                    engine="code-davinci-002",
                     prompt=query,
                     temperature=T,
                     max_tokens=max_tokens,
@@ -23,14 +27,17 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
                     presence_penalty=0,
                     stop=stop,
                     n=n,
+                    suffix=suffix
                 )
                 break
         except openai.error.RateLimitError:
             print('Rate limit exceeded (even though we limit!), retrying...')
             time.sleep(15)
             continue
-
-    return [r['text'] for r in response['choices']]
+    if suffix is None:
+        return [r['text'] for r in response['choices']]
+    else:
+        return [query + r['text'] + suffix for r in response['choices']]
 
 
 def nlp_engine(query, T=0.3):

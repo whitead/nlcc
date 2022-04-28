@@ -37,6 +37,8 @@ for f in files(nlcc.prompts).iterdir():
 
 
 def guess_query_type(query):
+    if '[insert]' in query:
+        return 'insert'
     if len(query) == 0:
         return 'continue'
     if len(query.split('\n')) == 1:
@@ -61,13 +63,14 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
             query = context.prompt.comment + ' ' + query + '\n'
         query = context.text + '\n' + \
             query if len(context.text) > 0 else query
-    elif query_type == 'code':
+    elif query_type == 'code' or query_type == 'insert':
         query = context.text + '\n' + \
             query if len(context.text) > 0 else query
     context.query = query
     context.query_type = query_type
     r = engine(query, T=T, stop=context.prompt.stop, n=n)
-    context.responses = tuple([query + ri for ri in r])
+    context.responses = tuple(
+        [ri if query_type == 'insert' else query + ri for ri in r])
     return context
 
 

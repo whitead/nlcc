@@ -121,3 +121,90 @@ sympy:
     language: python
     stop:
         - "# end"
+
+
+numpy-insert:
+    text: |
+        import numpy as np
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+    emoji: 🧮
+
+python-insert:
+    text: |
+        import math
+        import sys
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+
+rdkit:
+    text: |
+        import matplotlib.pyplot as plt
+        import rdkit
+        from rdkit import Chem
+        from rdkit.Chem import Draw
+        import rdkit.Chem.rdMolDescriptors
+        import rdkit.Chem.Crippen
+        import rdkit.Chem.Descriptors
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+biopython:
+    text: |
+        from Bio import SeqIO
+        from Bio import Align
+        from Bio import PopGen
+        from Bio.PDB import *
+        from Bio.Seq import Seq
+        import Bio
+        from Bio import pairwise2
+        from Bio.Blast import NCBIWWW, NCBIXML
+        from Bio.SubsMat import MatrixInfo as matlist
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+requests:
+    text: |
+        import requests
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+pyscf:
+    text: |
+        import pyscf
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+
+sympy:
+    text: |
+        import sympy
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
