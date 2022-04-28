@@ -41,7 +41,8 @@ rdkit:
         from rdkit.Chem import Draw
         import rdkit.Chem.rdMolDescriptors
         import rdkit.Chem.Crippen
-        import rdkit.Chem.Descriptors
+        from rdkit.Chem import Descriptors
+        from rdkit.ML.Descriptors import MoleculeDescriptors
 
         """
         print rdkit version
@@ -156,7 +157,8 @@ rdkit:
         from rdkit.Chem import Draw
         import rdkit.Chem.rdMolDescriptors
         import rdkit.Chem.Crippen
-        import rdkit.Chem.Descriptors
+        from rdkit.Chem import Descriptors
+        from rdkit.ML.Descriptors import MoleculeDescriptors
 
     comment: '#'
     multiline_comment: '"""'

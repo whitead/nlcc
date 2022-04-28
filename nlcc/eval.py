@@ -17,10 +17,18 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
             prompt = nlp.prompts[config['context']]
         # special ones
         elif override_prompt == 'insert':
-            prompt = nlp.prompts[config['context'] + '-insert']
+            pkey = config['context'] + '-insert'
+            if pkey in nlp.prompts:
+                prompt = nlp.prompts[pkey]
+            else:
+                prompt = nlp.prompts[config['context']]
 
         elif override_prompt.startswith('header:'):
-            prompt = nlp.prompts[config['context'] + '-insert']
+            pkey = config['context'] + '-insert'
+            if pkey in nlp.prompts:
+                prompt = nlp.prompts[pkey]
+            else:
+                prompt = nlp.prompts[config['context']]
             prompt = dataclasses.replace(prompt)
             prompt.text = override_prompt.split(
                 'header:')[-1] + prompt.text
@@ -50,8 +58,10 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
     dir = os.path.dirname(path)
     with open(os.path.join(dir, config['prompt']), 'r') as f:
         query = f.read()
-    # TODO Better way?
-    # Make it so we can only get one function
+        # TODO: More transparent way to do this
+        if override_prompt is None or 'insert' not in override_prompt:
+            query = query.split('[insert]')[0]
+
     if context.prompt.stop is None:
         context.prompt.stop = ['def']
     elif 'def' not in context.prompt.stop:
