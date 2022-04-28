@@ -39,3 +39,4 @@ Please cite [our preprint](https://arxiv.org/abs/2108.13360)
 * `ctrl-l` load from file
 * `ctrl-n` update number of code responses
 * `ctrl-down` Enter multiline. `escape-enter` to enter prompt or `ctrl-down` to leave
+* `[insert]` Add this string to have completion inserted in a specific part of prompt
