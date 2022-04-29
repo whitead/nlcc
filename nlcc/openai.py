@@ -30,7 +30,6 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
                 )
                 break
         except openai.error.RateLimitError:
-            print('Rate limit exceeded (even though we limit!), retrying...')
             time.sleep(15)
             continue
     if suffix is None:

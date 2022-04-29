@@ -253,9 +253,9 @@ def human_check(yaml_files, n, engine, temperature, out_dir, prompt):
     for y in yaml_files:
         if out_dir is None:
             out_dir = os.path.dirname(y)
-
         report, info = eval_single(
-            y, engine=code_engine, n=n, T=temperature, category='human', override_prompt=prompt)
+            y, engine=code_engine, n=n, T=temperature, quiet=True,
+            category='human', override_prompt=prompt)
         if report is None:
             continue
         context = report["context"]
@@ -296,7 +296,8 @@ def eval(yaml_files, n, engine, temperature, terminal, prompt):
     collapsables = []
     for y in yaml_files:
         report, info = eval_single(
-            y, engine=code_engine, n=n, T=temperature, category='code', override_prompt=prompt)
+            y, engine=code_engine, n=n, quiet=not terminal,
+            T=temperature, category='code', override_prompt=prompt)
         if report is None:
             continue
         if terminal is True:

@@ -3,13 +3,13 @@ from . import nlp
 import os
 from rich import inspect, reconfigure, get_console
 from rich.console import Console
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr, nullcontext, ExitStack
 from textwrap import dedent
 from .timeout import timeout
 import dataclasses
 
 
-def eval_single(path, category=None, override_prompt=None, **kwargs):
+def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs):
     with open(path, 'r') as f:
         config = yaml.safe_load(f.read())
     try:
@@ -81,9 +81,15 @@ def eval_single(path, category=None, override_prompt=None, **kwargs):
         g = {}
         success = True
         try:
-            with redirect_stdout(None):
-                with timeout(seconds=10):
-                    exec(dir_string + r + '\n' + test_code, g)
+            if quiet:
+                cms = redirect_stdout(None), redirect_stderr(
+                    None), timeout(seconds=10)
+            else:
+                cms = (timeout(seconds=10),)
+            with ExitStack() as stack:
+                for c in cms:
+                    stack.enter_context(c)
+                exec(dir_string + r + '\n' + test_code, g)
             if 'result' not in g:
                 exceptions.append(
                     f'\nYou must have variable `result` defined. \n')

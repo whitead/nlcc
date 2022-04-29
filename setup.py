@@ -18,7 +18,7 @@ setup(name='nlcc',
       install_requires=[
           'click', 'importlib_resources',
           'importlib-metadata',
-          'numpy', 'pyyaml~=5.0',
+          'numpy', 'pyyaml',
           'openai', 'pyperclip',
           'prompt_toolkit', 'tabulate', 'pyrate-limiter',
           'rich'],
