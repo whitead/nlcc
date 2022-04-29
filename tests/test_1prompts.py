@@ -9,7 +9,7 @@ def test_prompt_validity():
                 path = os.path.join(root, filename)
                 try:
                     with open(path, 'r') as f:
-                        yaml.load(f)
+                        yaml.safe_load(f)
                 except yaml.YAMLError as exc:
                     print('Failed in', path)
                     print(exc)
