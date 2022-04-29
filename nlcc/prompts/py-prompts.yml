@@ -43,6 +43,7 @@ rdkit:
         import rdkit.Chem.Crippen
         from rdkit.Chem import Descriptors
         from rdkit.ML.Descriptors import MoleculeDescriptors
+        from rdkit import DataStructs
 
         """
         print rdkit version
@@ -149,7 +150,7 @@ python-insert:
     stop:
         - "def"
 
-rdkit:
+rdkit-insert:
     text: |
         import matplotlib.pyplot as plt
         import rdkit
@@ -159,13 +160,14 @@ rdkit:
         import rdkit.Chem.Crippen
         from rdkit.Chem import Descriptors
         from rdkit.ML.Descriptors import MoleculeDescriptors
+        from rdkit import DataStructs
 
     comment: '#'
     multiline_comment: '"""'
     language: python
     stop:
         - "def"
-biopython:
+biopython-insert:
     text: |
         from Bio import SeqIO
         from Bio import Align
@@ -182,7 +184,7 @@ biopython:
     language: python
     stop:
         - "def"
-requests:
+requests-insert:
     text: |
         import requests
 
@@ -191,7 +193,7 @@ requests:
     language: python
     stop:
         - "def"
-pyscf:
+pyscf-insert:
     text: |
         import pyscf
 
@@ -201,7 +203,7 @@ pyscf:
     stop:
         - "def"
 
-sympy:
+sympy-insert:
     text: |
         import sympy
 
