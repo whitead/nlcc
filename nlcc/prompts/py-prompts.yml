@@ -39,11 +39,13 @@ rdkit:
         import rdkit
         from rdkit import Chem
         from rdkit.Chem import Draw
-        import rdkit.Chem.rdMolDescriptors
-        import rdkit.Chem.Crippen
+        from rdkit.Chem import rdMolHash
+        from rdkit.Chem import rdMolDescriptors
+        from rdkit.Chem import Crippen
         from rdkit.Chem import Descriptors
         from rdkit.ML.Descriptors import MoleculeDescriptors
         from rdkit import DataStructs
+        import numpy as np
 
         """
         print rdkit version
@@ -95,6 +97,7 @@ requests:
 pyscf:
     text: |
         import pyscf
+        import numpy as np
 
         """
         Print pyscf version string
@@ -156,11 +159,15 @@ rdkit-insert:
         import rdkit
         from rdkit import Chem
         from rdkit.Chem import Draw
-        import rdkit.Chem.rdMolDescriptors
-        import rdkit.Chem.Crippen
+        from rdkit.Chem import rdMolHash
+        from rdkit.Chem import rdMolDescriptors
+        from rdkit.Chem import Scaffolds
+        from rdkit.Chem import Crippen
         from rdkit.Chem import Descriptors
         from rdkit.ML.Descriptors import MoleculeDescriptors
         from rdkit import DataStructs
+        from rdkit.Chem import Scaffolds
+        import numpy as np
 
     comment: '#'
     multiline_comment: '"""'
@@ -196,6 +203,8 @@ requests-insert:
 pyscf-insert:
     text: |
         import pyscf
+        import numpy as np
+
 
     comment: '#'
     multiline_comment: '"""'
