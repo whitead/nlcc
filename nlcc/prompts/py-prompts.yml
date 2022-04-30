@@ -17,6 +17,23 @@ numpy:
         - "# end"
     emoji: 🧮
 
+scipy:
+    text: |
+        import numpy as np
+        import scipy
+
+        """
+        Create matrix of ones
+        """
+        a = np.ones((5,10))
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
+    emoji: 🧮
+
 python:
     text: |
         import math
@@ -83,6 +100,7 @@ requests:
     text: |
         import requests
         from bs4 import BeautifulSoup
+        import numpy as np
 
         """
         print requests version
@@ -142,6 +160,17 @@ numpy-insert:
         - "def"
     emoji: 🧮
 
+scipy-insert:
+    text: |
+        import numpy as np
+        import scipy
+
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "def"
+
 python-insert:
     text: |
         import math
@@ -194,6 +223,8 @@ biopython-insert:
 requests-insert:
     text: |
         import requests
+        from bs4 import BeautifulSoup
+        import numpy as np
 
     comment: '#'
     multiline_comment: '"""'
