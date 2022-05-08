@@ -1,4 +1,5 @@
 import nlcc
+import nlcc.openai
 import yaml
 import os
 
