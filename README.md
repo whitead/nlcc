@@ -9,7 +9,7 @@
 pip install nlcc
 ```
 
-You must have either an OpenAI Codex key or HuggingFace API key. Make sure they are set via
+You must have either an OpenAI Codex key or HuggingFace API key (minimum plan level is Community Pro). Make sure they are set via
 `export OPENAI_API_KEY=<your key here>` or `export HUGGINGFACE_API_KEY=<your key here>`
 then `nlcc`
 
