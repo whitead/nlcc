@@ -57,7 +57,7 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
             if suffix:
                 enc_query += make_sentinel(0)
             data = dict(inputs=enc_query,
-                        options=dict(use_gpu=False, use_cache=True,
+                        options=dict(use_gpu=True, use_cache=True,
                                      wait_for_model=False),
                         parameters=dict(return_full_text=False, max_new_tokens=min(250, max_tokens),  # ??
                                         temperature=max(0.01, T), num_return_sequences=n, top_p=0.95, do_sample=True,
