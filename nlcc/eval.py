@@ -23,15 +23,20 @@ def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs
             else:
                 prompt = nlp.prompts[config['context']]
 
-        elif override_prompt.startswith('header:'):
-            pkey = config['context'] + '-insert'
+        elif override_prompt.startswith('header'):
+            extra = ''
+            if override_prompt.startswith('header-insert:'):
+                extra = '-insert'
+                header = override_prompt.split('header-insert:')[-1]
+            else:
+                header = override_prompt.split('header:')[-1]
+            pkey = config['context'] + extra
             if pkey in nlp.prompts:
                 prompt = nlp.prompts[pkey]
             else:
                 prompt = nlp.prompts[config['context']]
             prompt = dataclasses.replace(prompt)
-            prompt.text = override_prompt.split(
-                'header:')[-1] + prompt.text
+            prompt.text = header + prompt.text
         else:
             prompt = nlp.prompts[override_prompt]
         context = nlp.Context(
@@ -96,7 +101,8 @@ def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs
                 success = False
             runs.append(g['result'])
         except Exception as e:
-            print(e)
+            if not quiet:
+                print(e)
             exceptions.append(
                 f'{str(e)}')
             runs.append(False)

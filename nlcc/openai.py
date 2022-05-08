@@ -9,7 +9,7 @@ limiter = Limiter(RequestRate(23, Duration.MINUTE))
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
-def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896, engine="code-davinci-002"):
+def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896, language='python', engine="code-davinci-002"):
     suffix = None
     if '[insert]' in query:
         query, suffix = query.split('[insert]')

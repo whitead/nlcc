@@ -7,7 +7,7 @@ from pyrate_limiter import Duration, Limiter, RequestRate
 
 API_TOKEN = os.getenv('HUGGINGFACE_API_KEY')
 
-limiter = Limiter(RequestRate(60, Duration.MINUTE))
+limiter = Limiter(RequestRate(15, Duration.MINUTE))
 
 # lots of code from https://github.com/dpfried/incoder/blob/main/example_usage.py
 
@@ -84,12 +84,10 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
                 completion = strip_metadata(completion)
                 result.append(completion)
             break
-        # catch 503
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 503:
-                time.sleep(15)
-                continue
-            raise e
+        except:
+            # probably a timeout or 503
+            time.sleep(15)
+            continue
     if result is None:
         raise ValueError('Tried too many times')
     if suffix is None:

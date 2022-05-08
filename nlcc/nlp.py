@@ -13,7 +13,7 @@ class Prompt:
     comment: str = '# '
     multiline_comment: str = None
     stop: list = None
-    language: str = None
+    language: str = 'python'
     emoji: str = '💻'
 
 
@@ -68,7 +68,8 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
             query if len(context.text) > 0 else query
     context.query = query
     context.query_type = query_type
-    r = engine(query, T=T, stop=context.prompt.stop, n=n)
+    r = engine(query, T=T, stop=context.prompt.stop,
+               n=n, language=context.prompt.language)
     context.responses = tuple(
         [ri if query_type == 'insert' else query + ri for ri in r])
     return context

@@ -322,17 +322,20 @@ def eval(yaml_files, n, engine, temperature, terminal, prompt):
         collapsables.append(
             f'<details>\n<summary>{report["name"]}</summary>\n{info}</details>')
         table.append([report['name']] +
-                     ['Pass' if r else 'Fail' for r in report['result']])
+                     ['Pass' if r else 'Fail' for r in report['result']]
+                     )
     if terminal is True:
         return
     print('## Test Report')
     print('### Global Parameters')
     print('* Engine = ', engine)
-    print('* n = ', n, '\n')
+    print('* T = ', temperature, '\n')
+    if prompt:
+        print('* Prompt Override = ', prompt, '\n')
     print('### Code Results\n')
     print(tabulate(table, ['Test'] +
                    [f'Run {i}' for i in range(n)], tablefmt="github"))
-    print('### Details\n')
+    print('\n### Details\n')
     print('\n'.join(collapsables))
 
 
@@ -340,7 +343,7 @@ def eval(yaml_files, n, engine, temperature, terminal, prompt):
 @click.argument('yaml-files', type=click.Path(exists=True), nargs=-1)
 @click.argument('output', type=click.Path(exists=False))
 @click.option('--n', default=1, help='number of respones')
-@click.option('--engine', default='openai')
+@click.option('--engine', default='openai/code-davinci-002')
 @click.option('--temperature', default=0.2)
 @click.option('--prompt', default=None, type=str)
 def benchmark(yaml_files, output, n, engine, temperature, prompt):
@@ -356,8 +359,8 @@ def benchmark(yaml_files, output, n, engine, temperature, prompt):
             report['result'] = [False] * n
         for r in report['result']:
             table.append([report['name']] +
-                         [1 if r else 0] + [temperature])
+                         [1 if r else 0] + [temperature, engine])
     with open(output, 'w') as f:
         f.write(tabulate(table, ['name', 'result',
-                                 'temperature'], tablefmt="plain"))
+                                 'temperature', 'engine'], tablefmt="plain"))
         f.write('\n')
