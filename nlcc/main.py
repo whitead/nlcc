@@ -1,5 +1,4 @@
 from .eval import eval_single
-from nlcc.openai import code_engine, nlp_engine
 import os
 from rich.markdown import Markdown
 import pyperclip
@@ -12,7 +11,7 @@ from . import nlp
 import click
 from importlib_metadata import metadata
 from .prompt import text_iter, Modes, PromptManager
-from textwrap import dedent
+from functools import partial
 
 pretty.install()
 
@@ -60,17 +59,22 @@ def process_temperature(query, code_temp, nlp_temp, console):
 
 
 def get_engine(engine, console=None):
-    if engine == 'openai':
+    if 'openai' in engine:
         if console:
             console.print('Using OpenAI Engine💰💰💰')
         from .openai import nlp_engine, code_engine
-    elif engine == 'huggingface':
+        if '/' in engine:
+            nlp_engine = partial(nlp_engine, model=engine.split('/')[1])
+    elif 'incoder' in engine:
         if console:
-            console.print('Using Huggingface Engine🤗🤗🤗')
-        from .huggingface import nlp_engine
+            console.print(
+                'Using Huggingface Inference API facebook/incoder Engine🤗🤗🤗')
+        from .incoder import code_engine, nlp_engine
+        if '/' in engine:
+            nlp_engine = partial(nlp_engine, model=engine.split('/')[1])
     else:
         if console:
-            console.print('Unkown engine', engine)
+            console.print('Unknown engine', engine)
         exit(1)
     return nlp_engine, code_engine
 

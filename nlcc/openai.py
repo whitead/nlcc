@@ -9,7 +9,7 @@ limiter = Limiter(RequestRate(23, Duration.MINUTE))
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
-def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
+def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896, engine="code-davinci-002"):
     suffix = None
     if '[insert]' in query:
         query, suffix = query.split('[insert]')
@@ -17,7 +17,7 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896):
         try:
             with limiter.ratelimit('codex', delay=True):
                 response = openai.Completion.create(
-                    engine="code-davinci-002",
+                    engine=engine,
                     prompt=query,
                     temperature=T,
                     max_tokens=max_tokens,

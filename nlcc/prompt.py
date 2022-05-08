@@ -16,21 +16,28 @@ class Modes(Enum):
     SELECT_RESPONSE = 6
     MULTILINE = 7
 
+
 class PromptManager:
     def __init__(self):
         self.input_mode = [Modes.SELECT_CONTEXT]
         self.cli_prompt = ['👋']
+
     def push(self, prompt, mode):
         self.input_mode.append(mode)
         self.cli_prompt.append(prompt)
+
     def peek_mode(self):
         return self.input_mode[-1]
+
     def peek_cli_prompt(self):
         return self.cli_prompt[-1]
+
     def pop(self):
         self.cli_prompt.pop(), self.input_mode.pop()
+
     def __len__(self):
         return len(self.input_mode)
+
 
 def text_iter(pm, extra_kbs):
 
@@ -44,21 +51,18 @@ def text_iter(pm, extra_kbs):
         else:
             event.current_buffer.insert_text('\n')
 
-
     @kb.add('c-down')
     def _(event):
         if pm.peek_mode() != Modes.MULTILINE:
             pm.push('multiline📜', Modes.MULTILINE)
         else:
             pm.pop()
+
     @kb.add('escape', 'enter')
     def _(event):
         if pm.peek_mode() == Modes.MULTILINE:
             pm.pop()
             event.current_buffer.validate_and_handle()
-
-
-
 
     history = InMemoryHistory()
     session = PromptSession(
@@ -67,8 +71,8 @@ def text_iter(pm, extra_kbs):
         enable_history_search=True,
         complete_while_typing=True,
         multiline=True,
-        rprompt=lambda :f'{pm.peek_mode()}'
-        #key_bindings=kb
+        rprompt=lambda: f'{pm.peek_mode()}'
+        # key_bindings=kb
     )
 
     def kb_wrapper(fxn):
@@ -77,11 +81,9 @@ def text_iter(pm, extra_kbs):
             print_formatted_text('')
         return kbf
 
-
     session.key_bindings = kb
     for k, v in extra_kbs.items():
         kb.add(k)(kb_wrapper(v))
-
 
     while True:
         q = session.prompt(lambda: f'nlcc|{pm.peek_cli_prompt()}:>')

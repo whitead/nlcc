@@ -82,12 +82,13 @@ def guess_context(query, engine, T=0.4):
             matched = p
             e = prompts[p].emoji
     # try engine match
-    if not matched:
+    if not matched and len(query.strip()) > 0:
         r, _ = engine(query, T=T)
-        r = r.split()[0]
-        e, r = r.split(',')
-        if r in prompts:
-            matched = r
+        if r is not None:
+            r = r.split()[0]
+            e, r = r.split(',')
+            if r in prompts:
+                matched = r
     if matched:
         context = Context(e + ' ' + matched,
                           prompts[matched], prompts[matched].text)

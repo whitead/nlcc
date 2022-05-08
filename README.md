@@ -9,7 +9,8 @@
 pip install nlcc
 ```
 
-Must have Open-AI Codex key: `export OPENAI_API_KEY=<your key here>`
+You must have either an OpenAI Codex key or HuggingFace API key. Make sure they are set via
+`export OPENAI_API_KEY=<your key here>` or `export HUGGINGFACE_API_KEY=<your key here>`
 then `nlcc`
 
 ## citation
@@ -39,4 +40,4 @@ Please cite [our preprint](https://arxiv.org/abs/2108.13360)
 * `ctrl-l` load from file
 * `ctrl-n` update number of code responses
 * `ctrl-down` Enter multiline. `escape-enter` to enter prompt or `ctrl-down` to leave
-* `[insert]` Add this string to have completion inserted in a specific part of prompt
+* `[insert]` Add this to your multiline prompt to have completion inserted in a specific location
