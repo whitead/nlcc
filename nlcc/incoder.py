@@ -34,7 +34,7 @@ def strip_metadata(s):
 
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
                 model='facebook/incoder-1B', language='python',
-                max_retries=10):
+                max_retries=100):
     suffix = None
     base_query = query
     if '[insert]' in query:
