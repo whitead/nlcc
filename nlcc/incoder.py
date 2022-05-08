@@ -66,8 +66,11 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
                 web_response = requests.request(
                     "POST", API_URL, headers=headers, data=json.dumps(data))
             response = json.loads(web_response.content.decode("utf-8"))
-            if 'estimated_time' in response or 'timed out' in response:
-                time.sleep(int(response['estimated_time']) / 2)
+            if 'estimated_time' in response:
+                time.sleep(int(response['estimated_time']))
+                continue
+            if 'timed out' in response:
+                time.sleep(15)
                 continue
             result = []
             for r in response:
