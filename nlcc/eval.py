@@ -16,7 +16,7 @@ def sanitize(code):
     """
     code = code.replace('quit()', 'pass')
     # in case its passing exit codes
-    code = re.sub(r'[sy\.]*exit\(\d*\)', 'pass', code)
+    code = re.sub(r'[sy\.]*exit\(.*\)', 'pass', code)
     return code
 
 
@@ -105,7 +105,10 @@ def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs
             with ExitStack() as stack:
                 for c in cms:
                     stack.enter_context(c)
+                print(r)
+                print(sanitize(r))
                 exec(dir_string + sanitize(r) + '\n' + test_code, g)
+                print('Finished test code')
             if 'result' not in g:
                 exceptions.append(
                     f'\nYou must have variable `result` defined. \n')
@@ -122,6 +125,7 @@ def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs
         code_str = r + '\n' + test_code
         markdown += f'```py\n{code_str}\n```\n'
         markdown += f'Output:\n```\n{"Success" if success else exceptions[-1]}\n```\n\n'
+    print('made it here')
     result = {'name': config['name'], 'context': context, 'result': runs}
 
     # can be too long
