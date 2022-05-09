@@ -1,6 +1,7 @@
 from pkg_resources import safe_name
 import yaml
 from . import nlp
+import re
 import os
 from rich import inspect, reconfigure, get_console
 from rich.console import Console
@@ -13,9 +14,9 @@ import dataclasses
 def sanitize(code):
     """Remove things that blow-up the runtime, like exits
     """
-    code = code.replace('sys.exit()', 'pass')
-    code = code.replace('exit()', 'pass')
     code = code.replace('quit()', 'pass')
+    # in case its passing exit codes
+    code = re.sub(r'[sy\.]*exit\(\d*\)', 'pass', code)
     return code
 
 
