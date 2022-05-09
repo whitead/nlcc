@@ -1,6 +1,22 @@
 numpy:
     text: |
         import numpy as np
+
+        """
+        Create matrix of ones
+        """
+        a = np.ones((5,10))
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
+    emoji: 🧮
+
+matplotlib:
+    text: |
+        import numpy as np
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
@@ -149,15 +165,31 @@ sympy:
 numpy-insert:
     text: |
         import numpy as np
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
 
     comment: '#'
     multiline_comment: '"""'
     language: python
     stop:
         - "def"
+    emoji: 🧮
+
+matplotlib-insert:
+    text: |
+        import numpy as np
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+
+        """
+        Create matrix of ones
+        """
+        a = np.ones((5,10))
+        # end
+    comment: '#'
+    multiline_comment: '"""'
+    language: python
+    stop:
+        - "# end"
     emoji: 🧮
 
 scipy-insert:
