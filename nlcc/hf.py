@@ -67,8 +67,13 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
             continue
     if result is None:
         raise ValueError('Tried too many times')
-    else:
-        return [query + r for r in result]
+    # apply stop tokens
+    for i, r in enumerate(result):
+        if stop is not None:
+            for s in stop:
+                if s in r:
+                    result[i] = r[:r.index(s)]
+    return result
 
 
 def nlp_engine(query, model='gpt2', min_length=50, T=-1):
