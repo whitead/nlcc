@@ -13,6 +13,8 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896, language='python'
     suffix = None
     if '[insert]' in query:
         query, suffix = query.split('[insert]')
+    if stop == []:
+        stop = None
     while True:
         try:
             with limiter.ratelimit('codex', delay=True):
