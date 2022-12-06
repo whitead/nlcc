@@ -9,18 +9,20 @@ API_TOKEN = os.getenv('HUGGINGFACE_API_KEY')
 
 limiter = Limiter(RequestRate(15, Duration.MINUTE))
 
-import requests
 
 API_URL = "https://api-inference.huggingface.co/models/Salesforce/codegen-16B-mono"
 headers = {"Authorization": "Bearer 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"}
 
+
 def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
-	return response.json()
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
+
 
 output = query({
-	"inputs": "Can you please let us know more details about your ",
+    "inputs": "Can you please let us know more details about your ",
 })
+
 
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
                 model=None, language='python',
@@ -35,17 +37,14 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
     for _ in range(max_retries):
         try:
             data = dict(inputs=query,
-                        options=dict(use_gpu=True, use_cache=True,
+                        options=dict(use_gpu=True, use_cache=False,
                                      wait_for_model=False),
                         parameters=dict(return_full_text=False, max_new_tokens=min(250, max_tokens),  # ??
                                         temperature=max(0.01, T), num_return_sequences=n, top_p=0.95, do_sample=True))
-            print(json.dumps(data))
-            print(API_URL)
             with limiter.ratelimit('hugging', delay=True):
                 web_response = requests.request(
                     "POST", API_URL, headers=headers, data=json.dumps(data))
             response = json.loads(web_response.content.decode("utf-8"))
-            print(response)
             if 'estimated_time' in response:
                 time.sleep(int(response['estimated_time']))
                 continue

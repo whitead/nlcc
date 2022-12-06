@@ -46,7 +46,7 @@ def guess_query_type(query):
     return 'code'
 
 
-def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
+def code_completion(query, context, engine, query_type=None, T=0.0, n=1, def_end=False):
     context.T = T
     if len(context.text) == 0:
         context.text = context.prompt.text
@@ -68,7 +68,7 @@ def code_completion(query, context, engine, query_type=None, T=0.0, n=1):
             query if len(context.text) > 0 else query
     context.query = query
     context.query_type = query_type
-    r = engine(query, T=T, stop=context.prompt.stop,
+    r = engine(query, T=T, stop=context.prompt.stop + ['def'] if def_end else [],
                n=n, language=context.prompt.language)
     context.responses = tuple(
         [ri if query_type == 'insert' else query + ri for ri in r])

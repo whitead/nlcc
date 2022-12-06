@@ -298,7 +298,8 @@ def human_check(yaml_files, n, engine, temperature, out_dir, prompt):
 @click.option('--terminal', default=False, is_flag=True)
 @click.option('--temperature', default=0.2)
 @click.option('--prompt', default=None, type=str)
-def eval(yaml_files, n, engine, temperature, terminal, prompt):
+@click.option('--def-end', default=False, is_flag=True)
+def eval(yaml_files, n, engine, temperature, terminal, prompt, def_end):
     if terminal is True:
         console = Console()
     from tabulate import tabulate
@@ -308,7 +309,7 @@ def eval(yaml_files, n, engine, temperature, terminal, prompt):
     for y in yaml_files:
         report, info = eval_single(
             y, engine=code_engine, n=n, quiet=not terminal,
-            T=temperature, category='code', override_prompt=prompt)
+            T=temperature, category='code', override_prompt=prompt, def_end=def_end)
         if report is None:
             continue
         if terminal is True:
@@ -353,7 +354,8 @@ def eval(yaml_files, n, engine, temperature, terminal, prompt):
 @click.option('--engine', default='openai/code-davinci-002')
 @click.option('--temperature', default=0.2)
 @click.option('--prompt', default=None, type=str)
-def benchmark(yaml_files, output, n, engine, temperature, prompt):
+@click.option('--def-end', default=False, is_flag=True)
+def benchmark(yaml_files, output, n, engine, temperature, prompt, def_end):
     from tabulate import tabulate
     nlp_engine, code_engine = get_engine(engine)
     table = []
@@ -361,7 +363,7 @@ def benchmark(yaml_files, output, n, engine, temperature, prompt):
     for y in yaml_files:
         print(y)
         report, _ = eval_single(
-            y, engine=code_engine, n=n, T=temperature, override_prompt=prompt)
+            y, engine=code_engine, n=n, T=temperature, override_prompt=prompt, def_end=def_end)
         if report['result'] is None:
             report['result'] = [False] * n
         for r in report['result']:
