@@ -10,29 +10,15 @@ API_TOKEN = os.getenv('HUGGINGFACE_API_KEY')
 limiter = Limiter(RequestRate(15, Duration.MINUTE))
 
 
-API_URL = "https://api-inference.huggingface.co/models/Salesforce/codegen-16B-mono"
-headers = {"Authorization": "Bearer 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"}
-
-
-def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
-
-
-output = query({
-    "inputs": "Can you please let us know more details about your ",
-})
-
-
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896,
-                model=None, language='python',
+                engine=None, language='python',
                 max_retries=100):
     if '[insert]' in query:
         raise NotImplementedError('cannot insert in general HF')
-    if model is None:
-        raise ValueError('must specify model')
+    if engine is None:
+        raise ValueError('must specify model/engine')
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    API_URL = f"https://api-inference.huggingface.co/models/{model}"
+    API_URL = f"https://api-inference.huggingface.co/models/{engine}"
     result = None
     for _ in range(max_retries):
         try:

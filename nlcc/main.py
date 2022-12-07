@@ -64,25 +64,25 @@ def get_engine(engine, console=None):
             console.print('Using OpenAI Engine💰💰💰')
         from .openai import nlp_engine, code_engine
         if '/' in engine:
-            nlp_engine = partial(nlp_engine, model=engine.split('/')[1])
+            code_engine = partial(code_engine, engine=engine.split('/')[1])
     elif 'incoder/' in engine:
         if console:
             console.print(
                 'Using Huggingface Inference API facebook/incoder Engine🤗🤗🤗')
         from .incoder import code_engine, nlp_engine
         if '/' in engine:
-            nlp_engine = partial(nlp_engine, model=engine.split('/')[1])
+            code_engine = partial(code_engine, engine=engine.split('/')[1])
     elif ':local' in engine:
         if console:
             console.print('Using Local Huggingface Engine🤖🤖🤖')
         from .hf_local import nlp_engine, code_engine
-        code_engine = partial(code_engine, model=engine.split(':local')[0])
+        code_engine = partial(code_engine, engine=engine.split(':local')[0])
     else:
         if console:
             console.print(
                 'Using Huggingface Engine🤗🤗🤗')
         from .hf import code_engine, nlp_engine
-        code_engine = partial(code_engine, model=engine)
+        code_engine = partial(code_engine, engine=engine)
     return nlp_engine, code_engine
 
 

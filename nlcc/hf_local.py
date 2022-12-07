@@ -7,8 +7,9 @@ _tokenizers = {}
 
 
 def code_engine(query, T=0.00, stop=None, n=1, max_tokens=250,
-                model=None, language='python',
+                engine=None, language='python',
                 max_retries=100):
+    model = engine
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     if '[insert]' in query:
         raise NotImplementedError('cannot insert in general HF')
