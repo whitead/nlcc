@@ -78,7 +78,6 @@ rdkit:
         from rdkit.Chem import Descriptors
         from rdkit.ML.Descriptors import MoleculeDescriptors
         from rdkit import DataStructs
-        import numpy as np
 
         """
         print rdkit version

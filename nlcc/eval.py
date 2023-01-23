@@ -20,9 +20,14 @@ def sanitize(code):
     return code
 
 
-def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs):
-    with open(path, 'r') as f:
-        config = yaml.safe_load(f.read())
+def eval_single(config, category=None, override_prompt=None, quiet=False, **kwargs):
+    if isinstance(config, str):
+        path = config
+        dir = os.path.dirname(path)
+        with open(path, 'r') as f:
+            config = yaml.safe_load(f.read())
+    else:
+        dir = os.getcwd()
     try:
         if override_prompt is None:
             prompt = nlp.prompts[config['context']]
@@ -70,13 +75,15 @@ def eval_single(path, category=None, override_prompt=None, quiet=False, **kwargs
             disabled = True
     if disabled:
         return None, None
-
-    dir = os.path.dirname(path)
-    with open(os.path.join(dir, config['prompt']), 'r') as f:
-        query = f.read()
-        # TODO: More transparent way to do this
-        if override_prompt is None or 'insert' not in override_prompt:
-            query = query.split('[insert]')[0]
+    
+    if os.path.exists(os.path.join(dir, config['prompt'])):
+        with open(os.path.join(dir, config['prompt']), 'r') as f:
+            query = f.read()
+    else:
+        query = config['prompt']
+    # TODO: More transparent way to do this
+    if override_prompt is None or 'insert' not in override_prompt:
+        query = query.split('[insert]')[0]
 
     if context.prompt.stop is None:
         context.prompt.stop = ['def']

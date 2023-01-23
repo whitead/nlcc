@@ -2,6 +2,7 @@ import openai
 import os
 import time
 from pyrate_limiter import Duration, Limiter, RequestRate
+from .nlp import prompts
 
 limiter = Limiter(RequestRate(23, Duration.MINUTE))
 
@@ -41,9 +42,10 @@ def code_engine(query, T=0.00, stop=None, n=1, max_tokens=896, language='python'
 
 
 def nlp_engine(query, T=0.3):
+    names = ', '.join([p.emoji + ' ' + p.name for p in prompts.values()])
     response = openai.Completion.create(
         engine="davinci",
-        prompt=f"This takes text and identifies which computational chemistry library it is about and gives an appropriate emoji. \n\nText: \"Let's do something with mdtraj\"\nLibrary: ⚗,mdtraj\n###\nText: \"MD in gromacs\"\nLibrary: 🍏,gromacs\n###\nText: \"Protein analysis\"\nLibrary: 🌳,biopython\n###\nText: \"Write a slurm script\"\nLibrary: 📝,slurm\n###\nText: \"{query}\"\nLibrary:",
+        prompt=f"This takes text and identifies which computational chemistry library it is about and gives an appropriate emoji. The possibilities are: {names} \n\nText: \"Let's do something with mdtraj\"\nLibrary: ⚗,mdtraj\n###\nText: \"MD in gromacs\"\nLibrary: 🍏,gromacs\n###\nText: \"Protein analysis\"\nLibrary: 🌳,biopython\n###\nText: \"Write a slurm script\"\nLibrary: 📝,slurm\n###\nText: \"{query}\"\nLibrary:",
         temperature=T,
         max_tokens=60,
         top_p=1,
